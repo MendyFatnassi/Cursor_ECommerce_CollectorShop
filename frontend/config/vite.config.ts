@@ -11,10 +11,10 @@ export default defineConfig({
   base: '/', 
   resolve: {
     alias: {
-      '@components': path.resolve(__dirname, './src/components'),
-      '@api': path.resolve(__dirname, './src/api'),
-      '@types': path.resolve(__dirname, './src/types'),
-      '@store': path.resolve(__dirname, './src/store')
+      '@components': path.resolve(__dirname, '../src/components'),
+      '@api': path.resolve(__dirname, '../src/api'),
+      '@types': path.resolve(__dirname, '../src/types'),
+      '@store': path.resolve(__dirname, '../src/store')
     }
   },
   preview: {

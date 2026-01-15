@@ -22,7 +22,7 @@
       "react-dom",
       "node"
     ],
-    "baseUrl": "./src",
+    "baseUrl": "../src",
     "paths": {
       "@components/*": [
         "components/*"
@@ -39,7 +39,7 @@
     }
   },
   "include": [
-    "src"
+    "../src"
   ]
 }
 

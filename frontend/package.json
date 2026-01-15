@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node ./node_modules/vite/bin/vite.js",
-    "build": "node ./node_modules/vite/bin/vite.js build",
-    "preview": "node ./node_modules/vite/bin/vite.js preview",
+    "dev": "node ./node_modules/vite/bin/vite.js --config config/vite.config.ts",
+    "build": "node ./node_modules/vite/bin/vite.js build --config config/vite.config.ts",
+    "preview": "node ./node_modules/vite/bin/vite.js preview --config config/vite.config.ts",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "deploy": "npm run build"
   },
