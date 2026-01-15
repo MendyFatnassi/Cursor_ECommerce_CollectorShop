@@ -1,0 +1,26 @@
+services:
+  backend:
+    image: maven:3.9-eclipse-temurin-21
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+      - m2-cache:/root/.m2
+    ports:
+      # 8080 hôte est souvent déjà utilisé (Spring/containers). On expose sur 8082 côté hôte.
+      - "8082:8080"
+    command: >
+      mvn -DskipTests spring-boot:run
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - backend
+    ports:
+      # Front servi par nginx sur 80 dans le conteneur
+      - "8081:8080"
+
+volumes:
+  m2-cache:
+

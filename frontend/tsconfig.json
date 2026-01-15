@@ -19,7 +19,8 @@
     "types": [
       "vite/client",
       "react",
-      "react-dom"
+      "react-dom",
+      "node"
     ],
     "baseUrl": "./src",
     "paths": {
