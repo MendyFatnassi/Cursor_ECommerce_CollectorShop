@@ -8,6 +8,6 @@ jobs:
       - name : CI
         run : echo "CI" && mvn test
 
-      -name : CD
-        run :echo "CD"
+      - name : CD
+        run : echo "CD"
       
