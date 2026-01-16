@@ -2,12 +2,15 @@ name: GitHub Actions
 run-name: ${{ github.actor }} GitHub Actions 🚀
 on: [push]
 jobs:
-  GitHub-Actions:
+  CI : 
+      runs-on: alpine-latest
+      steps:
+        - name : CI
+          run : echo "CI" && mvn test
+          
+  CD : 
     runs-on: alpine-latest
     steps:
-      - name : CI
-        run : echo "CI" && mvn test
-
       - name : CD
-        run : echo "CD"
+        run : echo "CD" 
       
