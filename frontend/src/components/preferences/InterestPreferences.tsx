@@ -13,7 +13,7 @@ const InterestPreferences = () => {
         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
           <span className="text-xl">🔒</span>
         </div>
-        <p className="text-sm text-slate-500">Connectez-vous pour gérer vos centres d'intérêt.</p>
+        <p className="text-sm text-slate-500">Connectez-vous pour gérer vos centres d&apos;intérêt.</p>
       </div>
     );
   }
@@ -31,7 +31,7 @@ const InterestPreferences = () => {
         <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg">
           <span className="text-white text-xl">❤️</span>
         </div>
-        <h3 className="text-lg font-bold text-slate-800">Centres d'intérêt</h3>
+        <h3 className="text-lg font-bold text-slate-800">Centres d&apos;intérêt</h3>
       </div>
       <div className="flex gap-2">
         <input
@@ -56,7 +56,7 @@ const InterestPreferences = () => {
           </span>
         ))}
         {!profile.interestTags.length && (
-          <p className="text-sm text-slate-500 w-full text-center py-4">Pas d'intérêts déclarés.</p>
+          <p className="text-sm text-slate-500 w-full text-center py-4">Pas d&apos;intérêts déclarés.</p>
         )}
       </div>
     </div>

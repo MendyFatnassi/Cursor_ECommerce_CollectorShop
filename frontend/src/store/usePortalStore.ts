@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { UserProfile, ListingSummary, ChatThread, NotificationPreference } from '@types/index';
+import { UserProfile, ListingSummary, ChatThread, NotificationPreference } from '@shared/index';
 
 interface PortalState {
   profile?: UserProfile;

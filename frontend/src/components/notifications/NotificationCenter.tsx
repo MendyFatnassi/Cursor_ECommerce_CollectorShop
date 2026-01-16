@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import client from '@api/client';
-import { NotificationPreference } from '@types/index';
+import { NotificationPreference } from '@shared/index';
 
 interface NotificationEvent {
   id: string;

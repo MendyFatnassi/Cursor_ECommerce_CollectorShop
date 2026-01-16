@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import client from '@api/client';
-import { FraudAlert } from '@types/index';
+import type { FraudAlert } from '@shared/index';
 
 interface PendingListing {
   id: string;
@@ -43,7 +43,7 @@ const AdminModerationConsole = () => {
     <div className="space-y-8 animate-fade-in">
       <div className="mb-6">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-2">
-          Console d'administration
+          Console d&apos;administration
         </h1>
         <p className="text-slate-600">Modération et contrôle de sécurité</p>
       </div>

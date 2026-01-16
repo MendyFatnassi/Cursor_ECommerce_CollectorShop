@@ -1,4 +1,4 @@
-import { ListingSummary } from '@types/index';
+import { ListingSummary } from '@shared/index';
 
 interface PaymentStatusCardProps {
   listing: ListingSummary;

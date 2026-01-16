@@ -30,7 +30,7 @@
       "@api/*": [
         "api/*"
       ],
-      "@types/*": [
+      "@shared/*": [
         "types/*"
       ],
       "@store/*": [

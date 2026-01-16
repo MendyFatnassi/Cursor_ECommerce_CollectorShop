@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import client from '@api/client';
 import usePortalStore from '@store/usePortalStore';
-import { ListingSummary } from '@types/index';
+import { ListingSummary } from '@shared/index';
 
 const StoreManager = () => {
   const listings = usePortalStore((state) => state.listings);

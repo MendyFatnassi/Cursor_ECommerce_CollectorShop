@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import client from '@api/client';
-import { ListingSummary } from '@types/index';
+import { ListingSummary } from '@shared/index';
 
 const RecommendationPanel = () => {
   const [items, setItems] = useState<ListingSummary[]>([]);
@@ -25,7 +25,7 @@ const RecommendationPanel = () => {
         </div>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        {items.map((item, index) => (
+        {items.map((item) => (
           <article
             key={item.id}
             className="group border-2 border-slate-200 rounded-xl p-4 hover:border-purple-300 hover:shadow-md transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-purple-50/30"

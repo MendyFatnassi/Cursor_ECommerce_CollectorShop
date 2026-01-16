@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import usePortalStore from '@store/usePortalStore';
 import client from '@api/client';
-import { ChatThread } from '@types/index';
+import { ChatThread } from '@shared/index';
 
 interface ConversationPanelProps {
   context: 'buyer' | 'seller';
