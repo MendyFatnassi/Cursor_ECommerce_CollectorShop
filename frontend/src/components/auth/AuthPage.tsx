@@ -2,8 +2,13 @@ import { useState } from 'react';
 import client from '@api/client';
 import usePortalStore from '@store/usePortalStore';
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
 
 type AuthMode = 'login' | 'register';
+
+interface ApiErrorResponse {
+  message?: string;
+}
 
 const AuthPage = () => {
   const [mode, setMode] = useState<AuthMode>('login');
@@ -42,8 +47,9 @@ const AuthPage = () => {
         setProfile(response.data.profile);
         navigate('/buyer');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur de connexion');
+    } catch (err) {
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      setError(axiosError.response?.data?.message || 'Erreur de connexion');
     } finally {
       setLoading(false);
     }
@@ -79,8 +85,9 @@ const AuthPage = () => {
         const redirectPath = registerData.role === 'SELLER' ? '/seller' : '/buyer';
         navigate(redirectPath);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors de l&apos;inscription');
+    } catch (err) {
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      setError(axiosError.response?.data?.message || 'Erreur lors de l&apos;inscription');
     } finally {
       setLoading(false);
     }
