@@ -5,10 +5,12 @@ import SellerDashboard from '@components/dashboard/SellerDashboard';
 import AdminModerationConsole from '@components/admin/AdminModerationConsole';
 import ConversationPanel from '@components/chat/ConversationPanel';
 import NotificationCenter from '@components/notifications/NotificationCenter';
+import AuthPage from '@components/auth/AuthPage';
 
 const App = () => (
   <Routes>
-    <Route path="/" element={<Navigate to="/buyer" replace />} />
+    <Route path="/auth" element={<AuthPage />} />
+    <Route path="/" element={<Navigate to="/auth" replace />} />
     <Route element={<DashboardLayout />}>
       <Route path="/buyer" element={<BuyerDashboard />} />
       <Route path="/seller" element={<SellerDashboard />} />

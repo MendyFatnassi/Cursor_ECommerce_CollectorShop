@@ -9,6 +9,7 @@ interface PortalState {
   setProfile: (profile: UserProfile) => void;
   setListings: (listings: ListingSummary[]) => void;
   upsertNotificationPref: (pref: NotificationPreference) => void;
+  logout: () => void;
 }
 
 const usePortalStore = create<PortalState>((set) => ({
@@ -22,7 +23,8 @@ const usePortalStore = create<PortalState>((set) => ({
       const next = state.notificationPrefs.filter((p) => p.id !== pref.id);
       next.push(pref);
       return { notificationPrefs: next };
-    })
+    }),
+  logout: () => set({ profile: undefined, listings: [], chatThreads: [], notificationPrefs: [] }),
 }));
 
 export default usePortalStore;
