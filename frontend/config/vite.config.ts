@@ -22,14 +22,18 @@ export default defineConfig({
     strictPort: true,
    },
   server: {
-    port: 8080,
+    port: 3000,
     host: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
-        changeOrigin: true
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       }
     }
+  },
+  css: {
+    postcss: './postcss.config.js'
   }
 });
 
