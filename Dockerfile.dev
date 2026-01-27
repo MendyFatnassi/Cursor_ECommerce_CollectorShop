@@ -13,8 +13,8 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 # Copier le reste du code frontend (y compris index.html, src, vite.config, etc.)
 COPY frontend/ .
 
-# Construire l'application pour la prod
-RUN npm run build
+# Lancer l'application en mode développement
+RUN npm run dev
 
 ### Étape 2 : image finale avec serveur web léger (nginx)
 FROM nginx:stable-alpine
