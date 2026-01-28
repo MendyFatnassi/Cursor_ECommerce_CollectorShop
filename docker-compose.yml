@@ -17,6 +17,8 @@ services:
       dockerfile: Dockerfile.dev
     depends_on:
       - backend
+    environment:
+      - VITE_API_URL=http://backend:8080
     ports:
       # Front servi par nginx sur 80 dans le conteneur
       - "8081:8080"
