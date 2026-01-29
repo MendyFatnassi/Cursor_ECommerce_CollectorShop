@@ -218,7 +218,7 @@ const AuthPage = () => {
             <span className="text-white text-3xl">🛍️</span>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Collector Shop - Hack ccw
+            Collector Shop - Projet Test Cursor Cube 3
           </h1>
           <p className="text-slate-600 text-sm">
             {mode === 'login' ? 'Connectez-vous à votre compte' : 'Créez votre compte'}
