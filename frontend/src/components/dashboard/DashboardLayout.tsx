@@ -1,26 +1,37 @@
 import { useEffect } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import client, { getAuthToken } from '@api/client';
 import usePortalStore from '@store/usePortalStore';
+import { UserRole } from '@shared/index';
 
-const links = [
-  { to: '/buyer', label: 'Acheteur' },
-  { to: '/seller', label: 'Vendeur' },
-  { to: '/chat', label: 'Chat' },
-  { to: '/notifications', label: 'Notifications' },
-  { to: '/admin', label: 'Admin' }
+type NavLinkConfig = { to: string; label: string; roles?: UserRole[]; public?: boolean };
+
+const links: NavLinkConfig[] = [
+  { to: '/buyer', label: 'Acheteur', roles: ['BUYER'], public: true },
+  { to: '/seller', label: 'Vendeur', roles: ['SELLER'] },
+  { to: '/chat', label: 'Chat', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+  { to: '/notifications', label: 'Notifications', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+  { to: '/admin', label: 'Admin', roles: ['ADMIN'] }
 ];
 
 const DashboardLayout = () => {
   const profile = usePortalStore((state) => state.profile);
   const setProfile = usePortalStore((state) => state.setProfile);
   const logout = usePortalStore((state) => state.logout);
+  const location = useLocation();
   const navigate = useNavigate();
+  const roles = profile?.roles ?? [];
+  const visibleLinks = profile
+    ? links.filter((link) => !link.roles || link.roles.some((role) => roles.includes(role)))
+    : links.filter((link) => link.public);
 
   useEffect(() => {
     const token = getAuthToken();
+    const isPublicBuyerRoute = location.pathname.startsWith('/buyer');
     if (!token && !profile) {
-      navigate('/auth');
+      if (!isPublicBuyerRoute) {
+        navigate('/auth');
+      }
       return;
     }
     if (profile || !token) {
@@ -36,7 +47,7 @@ const DashboardLayout = () => {
       }
     };
     loadProfile();
-  }, [profile, navigate, logout, setProfile]);
+  }, [profile, location.pathname, navigate, logout, setProfile]);
 
   const handleLogout = async () => {
     try {
@@ -68,7 +79,7 @@ const DashboardLayout = () => {
             </div>
             <div className="flex items-center gap-4">
               <nav className="flex gap-2">
-                {links.map((link) => (
+                {visibleLinks.map((link) => (
                   <NavLink
                     key={link.to}
                     to={link.to}
