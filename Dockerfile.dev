@@ -1,28 +1,12 @@
-### Étape 1 : build frontend avec Node
-FROM node:20-alpine AS build
+FROM node:20-alpine
 
-# Dossier de travail directement sur le frontend
-WORKDIR /app/frontend
+WORKDIR /app
 
-# Copier uniquement les fichiers nécessaires pour installer les dépendances
-COPY frontend/package.json frontend/package-lock.json* ./
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
 
-# Installer les dépendances (utilise npm ci si le lockfile existe, sinon npm install)
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
-
-# Copier le reste du code frontend (y compris index.html, src, vite.config, etc.)
 COPY frontend/ .
-
-# Construire l'application pour la prod
-RUN npm run build
-
-### Étape 2 : image finale avec serveur web léger (nginx)
-FROM nginx:stable-alpine
-
-# Copier le build Vite dans nginx
-COPY --from=build /app/frontend/dist /usr/share/nginx/html
 
 EXPOSE 8080
 
-CMD ["nginx", "-g", "daemon off;"]
-
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
