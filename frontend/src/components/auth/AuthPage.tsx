@@ -70,7 +70,13 @@ const AuthPage = () => {
       if (response.data.profile && response.data.token) {
         setAuthToken(response.data.token);
         setProfile(response.data.profile);
-        navigate('/buyer');
+        const roles = response.data.profile.roles ?? [];
+        const redirectPath = roles.includes('ADMIN')
+          ? '/admin'
+          : roles.includes('SELLER')
+            ? '/acceuil'
+            : '/buyer';
+        navigate(redirectPath);
       } else {
         setError('Connexion impossible. Vérifiez votre email avant de vous connecter.');
       }
@@ -124,7 +130,7 @@ const AuthPage = () => {
       if (response.data.token && response.data.profile) {
         setAuthToken(response.data.token);
         setProfile(response.data.profile);
-        const redirectPath = registerData.roles.includes('SELLER') ? '/seller' : '/buyer';
+        const redirectPath = registerData.roles.includes('SELLER') ? '/acceuil' : '/buyer';
         navigate(redirectPath);
         return;
       }

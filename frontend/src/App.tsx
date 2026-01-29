@@ -35,11 +35,13 @@ const RoleGuard = ({ allowedRoles, allowGuest = false, children }: RoleGuardProp
     return children;
   }
 
-  const fallback = profile.roles?.includes('SELLER')
-    ? '/seller'
-    : profile.roles?.includes('BUYER')
-      ? '/buyer'
-      : '/auth';
+  const fallback = profile.roles?.includes('ADMIN')
+    ? '/admin'
+    : profile.roles?.includes('SELLER')
+      ? '/acceuil'
+      : profile.roles?.includes('BUYER')
+        ? '/buyer'
+        : '/auth';
 
   return <Navigate to={fallback} replace />;
 };
@@ -58,13 +60,14 @@ const App = () => (
         }
       />
       <Route
-        path="/seller"
+        path="/acceuil"
         element={
           <RoleGuard allowedRoles={['SELLER']}>
             <SellerDashboard />
           </RoleGuard>
         }
       />
+      <Route path="/seller" element={<Navigate to="/acceuil" replace />} />
       <Route
         path="/chat"
         element={

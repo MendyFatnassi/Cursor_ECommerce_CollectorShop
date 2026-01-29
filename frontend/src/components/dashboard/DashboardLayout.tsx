@@ -8,7 +8,7 @@ type NavLinkConfig = { to: string; label: string; roles?: UserRole[]; public?: b
 
 const links: NavLinkConfig[] = [
   { to: '/buyer', label: 'Acheteur', roles: ['BUYER'], public: true },
-  { to: '/seller', label: 'Vendeur', roles: ['SELLER'] },
+  { to: '/acceuil', label: 'Accueil', roles: ['SELLER'] },
   { to: '/chat', label: 'Chat', roles: ['BUYER', 'SELLER', 'ADMIN'] },
   { to: '/notifications', label: 'Notifications', roles: ['BUYER', 'SELLER', 'ADMIN'] },
   { to: '/admin', label: 'Admin', roles: ['ADMIN'] }
