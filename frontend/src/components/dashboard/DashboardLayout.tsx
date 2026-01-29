@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import client, { getAuthToken } from '@api/client';
 import usePortalStore from '@store/usePortalStore';
 
 const links = [
@@ -11,10 +13,37 @@ const links = [
 
 const DashboardLayout = () => {
   const profile = usePortalStore((state) => state.profile);
+  const setProfile = usePortalStore((state) => state.setProfile);
   const logout = usePortalStore((state) => state.logout);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token && !profile) {
+      navigate('/auth');
+      return;
+    }
+    if (profile || !token) {
+      return;
+    }
+    const loadProfile = async () => {
+      try {
+        const response = await client.get('/profiles/me');
+        setProfile(response.data);
+      } catch {
+        logout();
+        navigate('/auth');
+      }
+    };
+    loadProfile();
+  }, [profile, navigate, logout, setProfile]);
+
+  const handleLogout = async () => {
+    try {
+      await client.post('/auth/logout');
+    } catch {
+      // Ignore logout errors, local cleanup is enough.
+    }
     logout();
     navigate('/auth');
   };

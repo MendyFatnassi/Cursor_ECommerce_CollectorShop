@@ -19,6 +19,13 @@ export interface ListingSummary {
   status: 'PENDING_REVIEW' | 'PUBLISHED' | 'PAUSED' | 'SOLD';
 }
 
+export interface SellerStore {
+  id: string;
+  name: string;
+  slug: string;
+  createdAt: string;
+}
+
 export interface NotificationPreference {
   id: string;
   channel: 'IN_APP' | 'EMAIL';

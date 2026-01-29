@@ -1,19 +1,49 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import client from '@api/client';
 import usePortalStore from '@store/usePortalStore';
-import { ListingSummary } from '@shared/index';
+import { ListingSummary, SellerStore } from '@shared/index';
 
 const StoreManager = () => {
   const listings = usePortalStore((state) => state.listings);
   const setListings = usePortalStore((state) => state.setListings);
+  const stores = usePortalStore((state) => state.stores);
+  const setStores = usePortalStore((state) => state.setStores);
+  const [showCreate, setShowCreate] = useState(false);
+  const [storeName, setStoreName] = useState('');
+  const [storeError, setStoreError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     const fetchListings = async () => {
       const response = await client.get<ListingSummary[]>('/seller/listings');
       setListings(response.data);
     };
+    const fetchStores = async () => {
+      const response = await client.get<SellerStore[]>('/stores');
+      setStores(response.data);
+    };
     fetchListings();
-  }, [setListings]);
+    fetchStores();
+  }, [setListings, setStores]);
+
+  const handleCreateStore = async () => {
+    if (!storeName.trim()) {
+      setStoreError('Le nom de la boutique est requis');
+      return;
+    }
+    setCreating(true);
+    setStoreError(null);
+    try {
+      const response = await client.post<SellerStore>('/stores', { name: storeName });
+      setStores([response.data, ...stores]);
+      setStoreName('');
+      setShowCreate(false);
+    } catch {
+      setStoreError('Impossible de créer la boutique');
+    } finally {
+      setCreating(false);
+    }
+  };
 
   return (
     <div className="card p-6 space-y-4">
@@ -30,11 +60,64 @@ const StoreManager = () => {
             </p>
           </div>
         </div>
-        <button className="btn-primary flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setShowCreate((prev) => !prev)}
+          className="btn-primary flex items-center gap-2"
+        >
           <span>+</span>
-          <span>Nouvelle boutique</span>
+          <span>{showCreate ? 'Annuler' : 'Nouvelle boutique'}</span>
         </button>
       </div>
+
+      {showCreate && (
+        <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3">
+          <div>
+            <label htmlFor="store-name" className="block text-sm font-medium text-slate-700 mb-1">
+              Nom de la boutique
+            </label>
+            <input
+              id="store-name"
+              type="text"
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+              className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 transition-all"
+              placeholder="Ex: RetroVault"
+            />
+          </div>
+          {storeError && <p className="text-sm text-red-600">{storeError}</p>}
+          <button
+            type="button"
+            onClick={handleCreateStore}
+            disabled={creating}
+            className="btn-primary w-full"
+          >
+            {creating ? 'Création...' : 'Créer la boutique'}
+          </button>
+        </div>
+      )}
+
+      <div className="space-y-3">
+        <div className="text-sm font-semibold text-slate-700">Mes boutiques</div>
+        {stores.map((store) => (
+          <div
+            key={store.id}
+            className="flex items-center justify-between border border-slate-200 rounded-lg px-4 py-3 bg-white"
+          >
+            <div>
+              <p className="font-medium text-slate-800">{store.name}</p>
+              <p className="text-xs text-slate-500">{store.slug}</p>
+            </div>
+            <span className="text-xs text-slate-400">
+              {new Date(store.createdAt).toLocaleDateString('fr-FR')}
+            </span>
+          </div>
+        ))}
+        {!stores.length && (
+          <div className="text-sm text-slate-500">Aucune boutique créée pour le moment.</div>
+        )}
+      </div>
+
       <div className="space-y-3">
         {listings.map((listing) => (
           <article
