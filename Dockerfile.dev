@@ -7,6 +7,15 @@ RUN npm ci
 
 COPY frontend/ .
 
+# Lancer l'application en mode développement
+RUN npm run dev
+
+### Étape 2 : image finale avec serveur web léger (nginx)
+FROM nginx:stable-alpine
+
+# Copier le build Vite dans nginx
+COPY --from=build /app/frontend/dist /usr/share/nginx/html
+
 EXPOSE 8080
 
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
