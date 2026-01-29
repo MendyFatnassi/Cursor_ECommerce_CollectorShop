@@ -37,7 +37,6 @@
 /workspace/src/main/java/com/collectorshop/auth/AuthService.java
 /workspace/src/main/java/com/collectorshop/shared/model/ChatThread.java
 /workspace/src/main/java/com/collectorshop/shared/model/ListingStatus.java
-/workspace/src/main/java/com/collectorshop/auth/UserRepository.java
 /workspace/src/main/java/com/collectorshop/shared/model/NotificationTrigger.java
 /workspace/src/main/java/com/collectorshop/auth/UserPrincipal.java
 /workspace/src/main/java/com/collectorshop/user/UserTokenType.java
@@ -49,6 +48,5 @@
 /workspace/src/main/java/com/collectorshop/chat/MessageSanitizer.java
 /workspace/src/main/java/com/collectorshop/user/UserAccountRepository.java
 /workspace/src/main/java/com/collectorshop/store/StoreCreateRequest.java
-/workspace/src/main/java/com/collectorshop/auth/User.java
 /workspace/src/main/java/com/collectorshop/auth/PasswordResetResponse.java
 /workspace/src/main/java/com/collectorshop/auth/VerifyEmailRequest.java

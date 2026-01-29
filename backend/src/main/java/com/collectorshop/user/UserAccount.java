@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user_accounts")
+@Table(name = "users")
 public class UserAccount {
 
     @Id
@@ -31,7 +31,7 @@ public class UserAccount {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String passwordHash;
 
     @Column(nullable = false)
@@ -50,7 +50,7 @@ public class UserAccount {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_interest_tags", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "interest_tag", nullable = false)
+    @Column(name = "tag", nullable = false)
     private Set<String> interestTags = new HashSet<>();
 
     @Column(nullable = false)
