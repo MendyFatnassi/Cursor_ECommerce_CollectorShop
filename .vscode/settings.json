@@ -2,5 +2,6 @@
     "java.compile.nullAnalysis.mode": "automatic",
     "java.project.sourcePaths": [
         "frontend"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

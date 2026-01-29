@@ -2,6 +2,12 @@
 # BACKEND (Java / Maven / Spring Boot)
 # ============================================
 
+# Base de données H2 (fichiers de données)
+backend/data/
+*.mv.db
+*.trace.db
+*.lock.db
+
 # Maven
 target/
 pom.xml.tag
