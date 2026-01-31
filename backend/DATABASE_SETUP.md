@@ -42,7 +42,58 @@ mkdir -p backend/data
 
 ---
 
-## Option 2 : PostgreSQL (Recommandé pour la production)
+## Option 2 : MySQL (Recommandé pour la persistance)
+
+**Avantages :**
+- ✅ Base de données populaire et largement supportée
+- ✅ Facile à héberger en local ou via Docker
+- ✅ Adaptée au développement et à la production
+
+### Option 2A : Docker (recommandé)
+
+Ce projet contient déjà une configuration Docker Compose avec MySQL. Il suffit de lancer :
+
+```bash
+docker compose up --build
+```
+
+La configuration est gérée par `application-mysql.yml` et le profil `mysql`.
+
+Pour visualiser la base en interface web, un service CloudBeaver est aussi disponible :
+- URL : http://localhost:8083
+- Hôte MySQL : `mysql`
+- Port : `3306`
+- Base : `collectorshop`
+- Utilisateur : `collectorshop_user`
+- Mot de passe : `collectorshop_password`
+Si vous obtenez l'erreur "Public Key Retrieval is not allowed", vous avez deux options :
+- Ajouter la propriété `allowPublicKeyRetrieval=true` dans les paramètres de connexion CloudBeaver
+- Ou ajouter la propriété `allowPublicKeyRetrieval=true` dans DBeaver (ou autre client local)
+
+### Option 2B : Installation locale
+
+1. **Installer MySQL** (via l'installeur officiel)
+2. **Créer la base et l'utilisateur :**
+   ```sql
+   CREATE DATABASE collectorshop;
+   CREATE USER 'collectorshop_user'@'%' IDENTIFIED BY 'collectorshop_password';
+   GRANT ALL PRIVILEGES ON collectorshop.* TO 'collectorshop_user'@'%';
+   FLUSH PRIVILEGES;
+   ```
+3. **Activer le profil MySQL dans `application.yml`** ou en variable d'environnement :
+   ```yaml
+   spring:
+     profiles:
+       active: mysql
+   ```
+   ou
+   ```bash
+   set SPRING_PROFILES_ACTIVE=mysql
+   ```
+
+---
+
+## Option 3 : PostgreSQL (Recommandé pour la production)
 
 **Avantages :**
 - ✅ Base de données robuste et performante
@@ -129,7 +180,7 @@ spring:
 
 ---
 
-## Option 3 : Docker avec PostgreSQL
+## Option 4 : Docker avec PostgreSQL
 
 **Avantages :**
 - ✅ Pas besoin d'installer PostgreSQL localement
@@ -186,6 +237,19 @@ psql -h localhost -U collectorshop_user -d collectorshop
 SELECT * FROM users;
 ```
 
+### MySQL
+```bash
+# Se connecter avec MySQL
+mysql -h localhost -u collectorshop_user -p collectorshop
+
+# Lister les tables
+SHOW TABLES;
+```
+
+### CloudBeaver (interface web)
+- URL : http://localhost:8083
+- En cas d'erreur "Public Key Retrieval is not allowed", ajoutez `allowPublicKeyRetrieval=true`
+
 ---
 
 ## Migration des données
@@ -207,5 +271,6 @@ Si vous avez déjà des données en mémoire H2 et voulez les migrer :
 ## Recommandations
 
 - **Développement** : Utilisez H2 en mode fichier
+- **Persistance simple** : Utilisez MySQL (Docker recommandé)
 - **Production** : Utilisez PostgreSQL
 - **Tests** : Utilisez H2 en mémoire
