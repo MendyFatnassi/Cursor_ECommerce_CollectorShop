@@ -8,6 +8,8 @@ import NotificationCenter from '@components/notifications/NotificationCenter';
 import AuthPage from '@components/auth/AuthPage';
 import ProfilePage from '@components/profile/ProfilePage';
 import HomePage from '@components/home/HomePage';
+import PublicStoresPage from './components/catalog/PublicStoresPage';
+import PublicListingsPage from './components/catalog/PublicListingsPage';
 import usePortalStore from '@store/usePortalStore';
 import { getAuthToken } from '@api/client';
 import { UserRole } from '@shared/index';
@@ -54,6 +56,8 @@ const App = () => (
     <Route path="/" element={<Navigate to="/acceuil" replace />} />
     <Route element={<DashboardLayout />}>
       <Route path="/acceuil" element={<HomePage />} />
+      <Route path="/boutiques" element={<PublicStoresPage />} />
+      <Route path="/articles" element={<PublicListingsPage />} />
       <Route
         path="/buyer"
         element={

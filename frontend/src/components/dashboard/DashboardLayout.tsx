@@ -8,6 +8,8 @@ type NavLinkConfig = { to: string; label: string; roles?: UserRole[]; public?: b
 
 const links: NavLinkConfig[] = [
   { to: '/acceuil', label: 'Accueil', public: true },
+  { to: '/boutiques', label: 'Boutiques', public: true },
+  { to: '/articles', label: 'Articles', public: true },
   { to: '/buyer', label: 'Dashboard Acheteur', roles: ['BUYER'] },
   { to: '/seller', label: 'Dashboard Vendeur', roles: ['SELLER'] },
   { to: '/chat', label: 'Chat', roles: ['BUYER', 'SELLER', 'ADMIN'] },
@@ -29,7 +31,9 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     const token = getAuthToken();
-    const isPublicRoute = location.pathname.startsWith('/acceuil');
+    const isPublicRoute = ['/acceuil', '/boutiques', '/articles'].some((route) =>
+      location.pathname.startsWith(route)
+    );
     if (!token && !profile) {
       if (!isPublicRoute) {
         navigate('/auth');
