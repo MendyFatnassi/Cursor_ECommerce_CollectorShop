@@ -3,5 +3,5 @@
     "java.project.sourcePaths": [
         "frontend"
     ],
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

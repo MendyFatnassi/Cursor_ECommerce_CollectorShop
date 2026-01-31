@@ -2,7 +2,10 @@ spring:
   application:
     name: collector-shop
   datasource:
-    url: jdbc:h2:mem:collector;DB_CLOSE_DELAY=-1
+    # H2 en mode fichier - les données sont sauvegardées dans backend/data/collector.mv.db
+    # Pour utiliser H2 en mémoire (données perdues au redémarrage), utilisez :
+    # url: jdbc:h2:mem:collector;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:file:./data/collector;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1
     username: sa
     password: ""
   jpa:
