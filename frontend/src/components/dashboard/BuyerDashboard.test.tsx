@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { beforeEach, vi } from 'vitest';
 import BuyerDashboard from './BuyerDashboard';
 import client from '@api/client';
 import usePortalStore from '@store/usePortalStore';
@@ -9,6 +9,12 @@ vi.mock('@api/client', () => ({
     get: vi.fn()
   }
 }));
+
+const clientMock = vi.mocked(client);
+
+beforeEach(() => {
+  clientMock.get.mockResolvedValue({ data: [] });
+});
 
 describe('BuyerDashboard', () => {
   it('affiche l’écran d’accueil si non connecté', () => {
@@ -50,7 +56,6 @@ describe('BuyerDashboard', () => {
       ]
     });
 
-    const clientMock = vi.mocked(client);
     clientMock.get.mockImplementation((url: string) => {
       if (url === '/recommendations') {
         return Promise.resolve({ data: [] });

@@ -125,7 +125,7 @@ const AuthPage = () => {
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
-      setError(axiosError.response?.data?.message || 'Erreur lors de l&apos;inscription');
+      setError(axiosError.response?.data?.message || "Erreur lors de l'inscription");
     } finally {
       setLoading(false);
     }
@@ -337,7 +337,7 @@ const AuthPage = () => {
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Inscription...' : 'S&apos;inscrire'}
+              {loading ? 'Inscription...' : "S'inscrire"}
             </button>
           </form>
         )}

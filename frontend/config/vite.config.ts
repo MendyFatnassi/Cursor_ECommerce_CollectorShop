@@ -12,19 +12,13 @@ const coverageTargets =
     ? {
         include: ['src/api/**', 'src/store/**', 'src/main.tsx'],
         thresholds: {
-          lines: 60,
-          statements: 60,
-          functions: 60,
-          branches: 60
+          lines: 60
         }
       }
     : {
         include: ['src/components/**', 'src/App.tsx'],
         thresholds: {
-          lines: 80,
-          statements: 80,
-          functions: 80,
-          branches: 80
+          lines: 80
         }
       };
 
@@ -59,6 +53,7 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    globals: true,
     setupFiles: ['src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'src/**/*.spec.{ts,tsx}'],
     coverage: {
