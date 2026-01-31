@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import usePortalStore from '@store/usePortalStore';
 
 const links = [
@@ -11,6 +11,14 @@ const links = [
 
 const DashboardLayout = () => {
   const profile = usePortalStore((state) => state.profile);
+  const logout = usePortalStore((state) => state.logout);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth');
+  };
+
   return (
     <div className="min-h-screen text-slate-900">
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-slate-200/50 shadow-sm">
@@ -29,23 +37,33 @@ const DashboardLayout = () => {
                 </div>
               </div>
             </div>
-            <nav className="flex gap-2">
-              {links.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  className={({ isActive }) =>
-                    `px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                      isActive
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`
-                  }
+            <div className="flex items-center gap-4">
+              <nav className="flex gap-2">
+                {links.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    className={({ isActive }) =>
+                      `px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                        isActive
+                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105'
+                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      }`
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+              </nav>
+              {profile && (
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                 >
-                  {link.label}
-                </NavLink>
-              ))}
-            </nav>
+                  Déconnexion
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>

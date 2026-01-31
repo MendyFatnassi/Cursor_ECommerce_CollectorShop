@@ -1,0 +1,24 @@
+# Configuration PostgreSQL (base de données robuste pour la production)
+spring:
+  application:
+    name: collector-shop
+  datasource:
+    url: jdbc:postgresql://localhost:5432/collectorshop
+    username: collectorshop_user
+    password: collectorshop_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  h2:
+    console:
+      enabled: false
+
+collector:
+  fraud:
+    outbound-url: https://fraud-gateway.example.com/hooks

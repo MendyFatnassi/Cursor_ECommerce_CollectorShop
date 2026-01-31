@@ -7,6 +7,26 @@ import usePortalStore from '@store/usePortalStore';
 
 const BuyerDashboard = () => {
   const listings = usePortalStore((state) => state.listings);
+  const profile = usePortalStore((state) => state.profile);
+
+  if (!profile) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+            Catalogue Acheteur
+          </h1>
+          <p className="text-slate-600">
+            Parcourez les articles. Connectez-vous pour suivre vos achats et vendre.
+          </p>
+        </div>
+        <RecommendationPanel />
+        <div className="card p-6 text-center text-sm text-slate-500">
+          Créez un compte pour accéder à vos achats, notifications et préférences.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">

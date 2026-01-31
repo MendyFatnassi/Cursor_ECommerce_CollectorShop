@@ -3,5 +3,9 @@
     "java.project.sourcePaths": [
         "frontend"
     ],
+<<<<<<< HEAD
     "java.configuration.updateBuildConfiguration": "interactive"
+=======
+    "java.configuration.updateBuildConfiguration": "automatic"
+>>>>>>> 196494d75bfcdca479704d25b651616123c6d6c0
 }
