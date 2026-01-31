@@ -32,7 +32,16 @@ public class UserProfileService {
         }
 
         if (request.roles() != null && !request.roles().isEmpty()) {
-            user.setRoles(request.roles());
+            Set<UserRole> nextRoles = request.roles().stream()
+                    .filter(role -> role == UserRole.BUYER || role == UserRole.SELLER)
+                    .collect(Collectors.toSet());
+            if (user.getRoles() != null && user.getRoles().contains(UserRole.ADMIN)) {
+                nextRoles.add(UserRole.ADMIN);
+            }
+            if (nextRoles.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Au moins un rôle est requis");
+            }
+            user.setRoles(nextRoles);
         }
 
         if (request.preferredLocales() != null && !request.preferredLocales().isEmpty()) {

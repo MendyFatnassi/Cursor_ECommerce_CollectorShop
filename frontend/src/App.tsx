@@ -7,6 +7,7 @@ import ConversationPanel from '@components/chat/ConversationPanel';
 import NotificationCenter from '@components/notifications/NotificationCenter';
 import AuthPage from '@components/auth/AuthPage';
 import ProfilePage from '@components/profile/ProfilePage';
+import HomePage from '@components/home/HomePage';
 import usePortalStore from '@store/usePortalStore';
 import { getAuthToken } from '@api/client';
 import { UserRole } from '@shared/index';
@@ -39,10 +40,10 @@ const RoleGuard = ({ allowedRoles, allowGuest = false, children }: RoleGuardProp
   const fallback = profile.roles?.includes('ADMIN')
     ? '/admin'
     : profile.roles?.includes('SELLER')
-      ? '/acceuil'
+      ? '/seller'
       : profile.roles?.includes('BUYER')
         ? '/buyer'
-        : '/auth';
+        : '/acceuil';
 
   return <Navigate to={fallback} replace />;
 };
@@ -50,25 +51,25 @@ const RoleGuard = ({ allowedRoles, allowGuest = false, children }: RoleGuardProp
 const App = () => (
   <Routes>
     <Route path="/auth" element={<AuthPage />} />
-    <Route path="/" element={<Navigate to="/buyer" replace />} />
+    <Route path="/" element={<Navigate to="/acceuil" replace />} />
     <Route element={<DashboardLayout />}>
+      <Route path="/acceuil" element={<HomePage />} />
       <Route
         path="/buyer"
         element={
-          <RoleGuard allowedRoles={['BUYER']} allowGuest>
+          <RoleGuard allowedRoles={['BUYER']}>
             <BuyerDashboard />
           </RoleGuard>
         }
       />
       <Route
-        path="/acceuil"
+        path="/seller"
         element={
           <RoleGuard allowedRoles={['SELLER']}>
             <SellerDashboard />
           </RoleGuard>
         }
       />
-      <Route path="/seller" element={<Navigate to="/acceuil" replace />} />
       <Route
         path="/chat"
         element={

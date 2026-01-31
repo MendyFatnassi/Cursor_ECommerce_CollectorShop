@@ -74,7 +74,7 @@ const AuthPage = () => {
         const redirectPath = roles.includes('ADMIN')
           ? '/admin'
           : roles.includes('SELLER')
-            ? '/acceuil'
+            ? '/seller'
             : '/buyer';
         navigate(redirectPath);
       } else {
@@ -130,7 +130,7 @@ const AuthPage = () => {
       if (response.data.token && response.data.profile) {
         setAuthToken(response.data.token);
         setProfile(response.data.profile);
-        const redirectPath = registerData.roles.includes('SELLER') ? '/acceuil' : '/buyer';
+        const redirectPath = registerData.roles.includes('SELLER') ? '/seller' : '/buyer';
         navigate(redirectPath);
         return;
       }

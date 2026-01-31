@@ -26,7 +26,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(registry -> registry
-                        .requestMatchers("/api/auth/**", "/h2-console/**", "/actuator/**").permitAll()
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/recommendations",
+                                "/api/ads/slots",
+                                "/h2-console/**",
+                                "/actuator/**"
+                        ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(httpBasic -> httpBasic.disable())

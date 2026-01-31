@@ -7,8 +7,9 @@ import { UserRole } from '@shared/index';
 type NavLinkConfig = { to: string; label: string; roles?: UserRole[]; public?: boolean };
 
 const links: NavLinkConfig[] = [
-  { to: '/buyer', label: 'Acheteur', roles: ['BUYER'], public: true },
-  { to: '/acceuil', label: 'Accueil', roles: ['SELLER'] },
+  { to: '/acceuil', label: 'Accueil', public: true },
+  { to: '/buyer', label: 'Dashboard Acheteur', roles: ['BUYER'] },
+  { to: '/seller', label: 'Dashboard Vendeur', roles: ['SELLER'] },
   { to: '/chat', label: 'Chat', roles: ['BUYER', 'SELLER', 'ADMIN'] },
   { to: '/notifications', label: 'Notifications', roles: ['BUYER', 'SELLER', 'ADMIN'] },
   { to: '/profil', label: 'Profil', roles: ['BUYER', 'SELLER', 'ADMIN'] },
@@ -28,9 +29,9 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     const token = getAuthToken();
-    const isPublicBuyerRoute = location.pathname.startsWith('/buyer');
+    const isPublicRoute = location.pathname.startsWith('/acceuil');
     if (!token && !profile) {
-      if (!isPublicBuyerRoute) {
+      if (!isPublicRoute) {
         navigate('/auth');
       }
       return;
@@ -96,12 +97,19 @@ const DashboardLayout = () => {
                   </NavLink>
                 ))}
               </nav>
-              {profile && (
+              {profile ? (
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                 >
                   Déconnexion
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                >
+                  Connexion
                 </button>
               )}
             </div>
