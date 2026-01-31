@@ -8,7 +8,12 @@
     "build": "node ./node_modules/vite/bin/vite.js build --config config/vite.config.ts",
     "preview": "node ./node_modules/vite/bin/vite.js preview --config config/vite.config.ts",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "test": "npm run lint",
+    "test": "npm run test:coverage",
+    "test:unit": "vitest run --config config/vite.config.ts",
+    "test:coverage:business": "cross-env COVERAGE_PROFILE=business vitest run --coverage --config config/vite.config.ts",
+    "test:coverage:infra": "cross-env COVERAGE_PROFILE=infra vitest run --coverage --config config/vite.config.ts",
+    "test:coverage": "npm run test:coverage:business && npm run test:coverage:infra",
+    "test:watch": "vitest --config config/vite.config.ts",
     "deploy": "npm run build"
   },
   "dependencies": {
@@ -20,20 +25,27 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^25.0.8",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.2",
     "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^2.1.9",
     "autoprefixer": "^10.4.23",
+    "cross-env": "^7.0.3",
     "eslint": "^9.0.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.7",
     "globals": "^17.0.0",
+    "jsdom": "^24.1.3",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.53.0",
-    "vite": "^5.4.21"
+    "vite": "^5.4.21",
+    "vitest": "^2.1.9"
   }
 }
