@@ -273,4 +273,25 @@ Si vous avez déjà des données en mémoire H2 et voulez les migrer :
 - **Développement** : Utilisez H2 en mode fichier
 - **Persistance simple** : Utilisez MySQL (Docker recommandé)
 - **Production** : Utilisez PostgreSQL
-- **Tests** : Utilisez H2 en mémoire
+- **Tests** : Utilisez H2 en mémoire (profil `test`)
+
+## Exécuter les tests avec H2
+
+```bash
+# PowerShell
+$env:SPRING_PROFILES_ACTIVE="test"
+mvn test
+```
+
+ou en une ligne :
+
+```bash
+mvn "-Dspring.profiles.active=test" test
+```
+
+Pour l'invite de commandes classique (cmd.exe) :
+
+```bash
+set SPRING_PROFILES_ACTIVE=test
+mvn test
+```

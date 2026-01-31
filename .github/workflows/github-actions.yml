@@ -21,7 +21,9 @@ jobs:
       # test backend
       - name: Run Maven tests
         working-directory: ./backend
-        run: mvn test 
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        run: mvn verify
 
       # ----------- FRONTEND -----------
       # configuration frontend
@@ -39,7 +41,7 @@ jobs:
         # test frontend
       - name: Run frontend tests
         working-directory: ./frontend
-        run: npm test  
+        run: npm run test:coverage  
           
   CD:
     runs-on: ubuntu-latest
