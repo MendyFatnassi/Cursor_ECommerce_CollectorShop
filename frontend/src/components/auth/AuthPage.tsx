@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import client from '@api/client';
+import client, { setAuthToken } from '@api/client';
 import usePortalStore from '@store/usePortalStore';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
+import { UserRole } from '@shared/index';
 
 type AuthMode = 'login' | 'register';
 
@@ -16,6 +17,15 @@ const AuthPage = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const setProfile = usePortalStore((state) => state.setProfile);
+  const resolveRedirect = (roles: UserRole[] = []) => {
+    if (roles.includes('SELLER')) {
+      return '/seller';
+    }
+    if (roles.includes('BUYER')) {
+      return '/buyer';
+    }
+    return '/accueil';
+  };
 
   // Formulaire de connexion
   const [loginData, setLoginData] = useState({
@@ -29,8 +39,18 @@ const AuthPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'BUYER' as 'BUYER' | 'SELLER',
+    roles: ['BUYER'] as UserRole[],
+    acceptedTerms: false,
   });
+
+  const toggleRegisterRole = (role: UserRole) => {
+    setRegisterData((current) => {
+      const nextRoles = current.roles.includes(role)
+        ? current.roles.filter((value) => value !== role)
+        : [...current.roles, role];
+      return { ...current, roles: nextRoles };
+    });
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,9 +63,12 @@ const AuthPage = () => {
         password: loginData.password,
       });
 
+      if (response.data.token) {
+        setAuthToken(response.data.token);
+      }
       if (response.data.profile) {
         setProfile(response.data.profile);
-        navigate('/buyer');
+        navigate(resolveRedirect(response.data.profile.roles));
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
@@ -72,18 +95,33 @@ const AuthPage = () => {
       return;
     }
 
+    if (registerData.roles.length === 0) {
+      setError('Sélectionnez au moins un rôle');
+      setLoading(false);
+      return;
+    }
+
+    if (!registerData.acceptedTerms) {
+      setError('Vous devez accepter les conditions');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await client.post('/auth/register', {
         fullName: registerData.fullName,
         email: registerData.email,
         password: registerData.password,
-        role: registerData.role,
+        roles: registerData.roles,
+        acceptedTerms: registerData.acceptedTerms,
       });
 
+      if (response.data.token) {
+        setAuthToken(response.data.token);
+      }
       if (response.data.profile) {
         setProfile(response.data.profile);
-        const redirectPath = registerData.role === 'SELLER' ? '/seller' : '/buyer';
-        navigate(redirectPath);
+        navigate(resolveRedirect(response.data.profile.roles));
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
@@ -225,23 +263,27 @@ const AuthPage = () => {
             </div>
 
             <div>
-              <label htmlFor="register-role" className="block text-sm font-medium text-slate-700 mb-1">
-                Type de compte
-              </label>
-              <select
-                id="register-role"
-                value={registerData.role}
-                onChange={(e) =>
-                  setRegisterData({
-                    ...registerData,
-                    role: e.target.value as 'BUYER' | 'SELLER',
-                  })
-                }
-                className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
-              >
-                <option value="BUYER">Acheteur</option>
-                <option value="SELLER">Vendeur</option>
-              </select>
+              <p className="block text-sm font-medium text-slate-700 mb-2">Rôles</p>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={registerData.roles.includes('BUYER')}
+                    onChange={() => toggleRegisterRole('BUYER')}
+                    className="accent-blue-600"
+                  />
+                  Acheteur
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={registerData.roles.includes('SELLER')}
+                    onChange={() => toggleRegisterRole('SELLER')}
+                    className="accent-emerald-600"
+                  />
+                  Vendeur
+                </label>
+              </div>
             </div>
 
             <div>
@@ -277,6 +319,18 @@ const AuthPage = () => {
                 minLength={6}
               />
             </div>
+
+            <label className="flex items-start gap-2 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={registerData.acceptedTerms}
+                onChange={(event) =>
+                  setRegisterData({ ...registerData, acceptedTerms: event.target.checked })
+                }
+                className="mt-1 accent-blue-600"
+              />
+              J&apos;accepte les conditions d&apos;utilisation.
+            </label>
 
             <button
               type="submit"

@@ -3,6 +3,8 @@ export type UserRole = 'BUYER' | 'SELLER' | 'ADMIN';
 export interface UserProfile {
   id: string;
   fullName: string;
+  email?: string;
+  emailVerified?: boolean;
   roles: UserRole[];
   preferredLocales: string[];
   reputation: number;
