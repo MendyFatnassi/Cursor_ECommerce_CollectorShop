@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import client from '@api/client';
 import usePortalStore from '@store/usePortalStore';
+import { UserRole } from '@shared/index';
 
 type SaveStatus = { type: 'success' | 'error'; message: string } | null;
 
@@ -9,6 +10,8 @@ const ProfilePage = () => {
   const setProfile = usePortalStore((state) => state.setProfile);
   const [fullName, setFullName] = useState('');
   const [locales, setLocales] = useState('');
+  const [isBuyer, setIsBuyer] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<SaveStatus>(null);
 
@@ -16,6 +19,8 @@ const ProfilePage = () => {
     if (!profile) return;
     setFullName(profile.fullName ?? '');
     setLocales(profile.preferredLocales?.join(', ') ?? '');
+    setIsBuyer(profile.roles?.includes('BUYER') ?? false);
+    setIsSeller(profile.roles?.includes('SELLER') ?? false);
   }, [profile]);
 
   const parsedLocales = useMemo(
@@ -31,15 +36,22 @@ const ProfilePage = () => {
     if (!profile) return;
     setFullName(profile.fullName ?? '');
     setLocales(profile.preferredLocales?.join(', ') ?? '');
+    setIsBuyer(profile.roles?.includes('BUYER') ?? false);
+    setIsSeller(profile.roles?.includes('SELLER') ?? false);
     setStatus(null);
   };
 
   const handleSave = async () => {
     if (!profile) return;
+    const hasAdmin = profile.roles?.includes('ADMIN') ?? false;
+    if (!isBuyer && !isSeller && !hasAdmin) {
+      setStatus({ type: 'error', message: 'Sélectionnez au moins un rôle (Acheteur ou Vendeur).' });
+      return;
+    }
     setSaving(true);
     setStatus(null);
     try {
-      const payload: { fullName?: string; preferredLocales?: string[] } = {};
+      const payload: { fullName?: string; preferredLocales?: string[]; roles?: UserRole[] } = {};
       const normalizedName = fullName.trim();
       if (normalizedName) {
         payload.fullName = normalizedName;
@@ -47,6 +59,11 @@ const ProfilePage = () => {
       if (parsedLocales.length) {
         payload.preferredLocales = parsedLocales;
       }
+      const roles: UserRole[] = [];
+      if (isBuyer) roles.push('BUYER');
+      if (isSeller) roles.push('SELLER');
+      if (hasAdmin) roles.push('ADMIN');
+      payload.roles = roles;
       const response = await client.patch('/profiles/me', payload);
       setProfile(response.data);
       setStatus({ type: 'success', message: 'Profil mis à jour avec succès.' });
@@ -64,6 +81,12 @@ const ProfilePage = () => {
       </div>
     );
   }
+
+  const hasAdmin = profile.roles?.includes('ADMIN') ?? false;
+  const previewRoles: UserRole[] = [];
+  if (isBuyer) previewRoles.push('BUYER');
+  if (isSeller) previewRoles.push('SELLER');
+  if (hasAdmin) previewRoles.push('ADMIN');
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -200,9 +223,38 @@ const ProfilePage = () => {
             </div>
 
             <div>
+              <div className="text-sm font-semibold text-slate-700 mb-2">Rôles (modifiables)</div>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={isBuyer}
+                    onChange={(event) => setIsBuyer(event.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Acheteur
+                </label>
+                <label className="flex items-center gap-2 text-sm text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={isSeller}
+                    onChange={(event) => setIsSeller(event.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Vendeur
+                </label>
+              </div>
+              {hasAdmin && (
+                <p className="text-xs text-slate-500 mt-2">
+                  Le rôle Admin n&apos;est pas modifiable ici.
+                </p>
+              )}
+            </div>
+
+            <div>
               <div className="text-sm font-semibold text-slate-700 mb-2">Rôles actifs</div>
               <div className="flex flex-wrap gap-2">
-                {profile.roles.map((role) => (
+                {previewRoles.map((role) => (
                   <span
                     key={role}
                     className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700"
@@ -211,7 +263,7 @@ const ProfilePage = () => {
                   </span>
                 ))}
               </div>
-              {!profile.roles.length && (
+              {!previewRoles.length && (
                 <p className="text-sm text-slate-500">Aucun rôle assigné.</p>
               )}
             </div>
