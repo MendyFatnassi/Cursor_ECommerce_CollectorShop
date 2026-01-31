@@ -3,8 +3,6 @@ export type UserRole = 'BUYER' | 'SELLER' | 'ADMIN';
 export interface UserProfile {
   id: string;
   fullName: string;
-  email: string;
-  emailVerified: boolean;
   roles: UserRole[];
   preferredLocales: string[];
   reputation: number;
@@ -19,13 +17,6 @@ export interface ListingSummary {
   thumbnailUrl: string;
   sellerId: string;
   status: 'PENDING_REVIEW' | 'PUBLISHED' | 'PAUSED' | 'SOLD';
-}
-
-export interface SellerStore {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt: string;
 }
 
 export interface NotificationPreference {

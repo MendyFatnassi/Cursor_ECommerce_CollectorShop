@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import client, { setAuthToken } from '@api/client';
+import client from '@api/client';
 import usePortalStore from '@store/usePortalStore';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
@@ -29,32 +29,8 @@ const AuthPage = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    roles: ['BUYER'] as Array<'BUYER' | 'SELLER'>,
-    acceptedTerms: false,
+    role: 'BUYER' as 'BUYER' | 'SELLER',
   });
-
-  const [verificationToken, setVerificationToken] = useState<string | null>(null);
-  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
-  const [forgotMode, setForgotMode] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [forgotMessage, setForgotMessage] = useState<string | null>(null);
-  const [resetToken, setResetToken] = useState('');
-  const [resetPassword, setResetPassword] = useState('');
-  const [resetConfirm, setResetConfirm] = useState('');
-
-  const toggleRole = (role: 'BUYER' | 'SELLER') => {
-    setRegisterData((prev) => {
-      const exists = prev.roles.includes(role);
-      const roles = exists ? prev.roles.filter((r) => r !== role) : [...prev.roles, role];
-      return { ...prev, roles };
-    });
-  };
-
-  const clearAuthMessages = () => {
-    setVerificationToken(null);
-    setVerificationMessage(null);
-    setForgotMessage(null);
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,18 +43,9 @@ const AuthPage = () => {
         password: loginData.password,
       });
 
-      if (response.data.profile && response.data.token) {
-        setAuthToken(response.data.token);
+      if (response.data.profile) {
         setProfile(response.data.profile);
-        const roles = response.data.profile.roles ?? [];
-        const redirectPath = roles.includes('ADMIN')
-          ? '/admin'
-          : roles.includes('SELLER')
-            ? '/seller'
-            : '/buyer';
-        navigate(redirectPath);
-      } else {
-        setError('Connexion impossible. Vérifiez votre email avant de vous connecter.');
+        navigate('/buyer');
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
@@ -99,21 +66,8 @@ const AuthPage = () => {
       return;
     }
 
-    const passwordValid = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(registerData.password);
-    if (!passwordValid) {
-      setError('Le mot de passe doit contenir 8 caractères minimum avec lettre et chiffre');
-      setLoading(false);
-      return;
-    }
-
-    if (!registerData.roles.length) {
-      setError('Sélectionnez au moins un rôle');
-      setLoading(false);
-      return;
-    }
-
-    if (!registerData.acceptedTerms) {
-      setError('Vous devez accepter les conditions RGPD');
+    if (registerData.password.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères');
       setLoading(false);
       return;
     }
@@ -123,93 +77,17 @@ const AuthPage = () => {
         fullName: registerData.fullName,
         email: registerData.email,
         password: registerData.password,
-        roles: registerData.roles,
-        acceptedTerms: registerData.acceptedTerms,
+        role: registerData.role,
       });
 
-      if (response.data.token && response.data.profile) {
-        setAuthToken(response.data.token);
+      if (response.data.profile) {
         setProfile(response.data.profile);
-        const redirectPath = registerData.roles.includes('SELLER') ? '/seller' : '/buyer';
+        const redirectPath = registerData.role === 'SELLER' ? '/seller' : '/buyer';
         navigate(redirectPath);
-        return;
-      }
-
-      setVerificationToken(response.data.verificationToken ?? null);
-      setVerificationMessage(
-        "Inscription réussie. Vérifiez votre email avant de vous connecter."
-      );
-    } catch (err) {
-      const axiosError = err as AxiosError<ApiErrorResponse>;
-      setError(axiosError.response?.data?.message || "Erreur lors de l'inscription");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyEmail = async () => {
-    if (!verificationToken) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await client.post('/auth/verify-email', { token: verificationToken });
-      setVerificationMessage('Email vérifié. Vous pouvez maintenant vous connecter.');
-      setVerificationToken(null);
-      setMode('login');
-    } catch (err) {
-      const axiosError = err as AxiosError<ApiErrorResponse>;
-      setError(axiosError.response?.data?.message || "Impossible de vérifier l'email");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setForgotMessage(null);
-    try {
-      const response = await client.post('/auth/password/forgot', { email: forgotEmail });
-      setForgotMessage(response.data?.message ?? "Si l'email existe, un lien a été envoyé");
-      if (response.data?.resetToken) {
-        setResetToken(response.data.resetToken);
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiErrorResponse>;
-      setError(axiosError.response?.data?.message || 'Erreur lors de la demande');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    if (resetPassword !== resetConfirm) {
-      setError('Les mots de passe ne correspondent pas');
-      setLoading(false);
-      return;
-    }
-
-    const passwordValid = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(resetPassword);
-    if (!passwordValid) {
-      setError('Le mot de passe doit contenir 8 caractères minimum avec lettre et chiffre');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      await client.post('/auth/password/reset', { token: resetToken, newPassword: resetPassword });
-      setForgotMessage('Mot de passe mis à jour. Vous pouvez vous connecter.');
-      setResetPassword('');
-      setResetConfirm('');
-      setMode('login');
-    } catch (err) {
-      const axiosError = err as AxiosError<ApiErrorResponse>;
-      setError(axiosError.response?.data?.message || 'Erreur lors de la réinitialisation');
+      setError(axiosError.response?.data?.message || 'Erreur lors de l&apos;inscription');
     } finally {
       setLoading(false);
     }
@@ -238,8 +116,6 @@ const AuthPage = () => {
             onClick={() => {
               setMode('login');
               setError(null);
-              clearAuthMessages();
-              setForgotMode(false);
             }}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
               mode === 'login'
@@ -254,8 +130,6 @@ const AuthPage = () => {
             onClick={() => {
               setMode('register');
               setError(null);
-              clearAuthMessages();
-              setForgotMode(false);
             }}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
               mode === 'register'
@@ -274,161 +148,47 @@ const AuthPage = () => {
           </div>
         )}
 
-        {verificationMessage && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm space-y-2">
-            <p>{verificationMessage}</p>
-            {verificationToken && (
-              <div className="space-y-2">
-                <p className="text-xs text-amber-600">
-                  Mode dev : token de validation <span className="font-mono">{verificationToken}</span>
-                </p>
-                <button
-                  type="button"
-                  onClick={handleVerifyEmail}
-                  disabled={loading}
-                  className="text-sm font-medium text-amber-700 hover:text-amber-800 underline"
-                >
-                  Valider mon email
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Formulaire de connexion */}
         {mode === 'login' && (
-          <div className="space-y-4">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label htmlFor="login-email" className="block text-sm font-medium text-slate-700 mb-1">
-                  Email
-                </label>
-                <input
-                  id="login-email"
-                  type="email"
-                  required
-                  value={loginData.email}
-                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
-                  placeholder="votre@email.com"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-slate-700 mb-1">
-                  Mot de passe
-                </label>
-                <input
-                  id="login-password"
-                  type="password"
-                  required
-                  value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
-                  placeholder="••••••••"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Connexion...' : 'Se connecter'}
-              </button>
-            </form>
-
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={() => setForgotMode((prev) => !prev)}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Mot de passe oublié ?
-              </button>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label htmlFor="login-email" className="block text-sm font-medium text-slate-700 mb-1">
+                Email
+              </label>
+              <input
+                id="login-email"
+                type="email"
+                required
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
+                placeholder="votre@email.com"
+              />
             </div>
 
-            {forgotMode && (
-              <form onSubmit={handleForgotPassword} className="space-y-3">
-                <div>
-                  <label htmlFor="forgot-email" className="block text-sm font-medium text-slate-700 mb-1">
-                    Email de récupération
-                  </label>
-                  <input
-                    id="forgot-email"
-                    type="email"
-                    required
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
-                    placeholder="votre@email.com"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-slate-100 text-slate-700 py-2 rounded-lg font-medium hover:bg-slate-200 transition-all"
-                >
-                  {loading ? 'Envoi...' : 'Recevoir le lien'}
-                </button>
-              </form>
-            )}
+            <div>
+              <label htmlFor="login-password" className="block text-sm font-medium text-slate-700 mb-1">
+                Mot de passe
+              </label>
+              <input
+                id="login-password"
+                type="password"
+                required
+                value={loginData.password}
+                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
+                placeholder="••••••••"
+              />
+            </div>
 
-            {forgotMode && resetToken && (
-              <form onSubmit={handleResetPassword} className="space-y-3">
-                <div>
-                  <label htmlFor="reset-token" className="block text-sm font-medium text-slate-700 mb-1">
-                    Token de réinitialisation
-                  </label>
-                  <input
-                    id="reset-token"
-                    type="text"
-                    required
-                    value={resetToken}
-                    onChange={(e) => setResetToken(e.target.value)}
-                    className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="reset-password" className="block text-sm font-medium text-slate-700 mb-1">
-                    Nouveau mot de passe
-                  </label>
-                  <input
-                    id="reset-password"
-                    type="password"
-                    required
-                    value={resetPassword}
-                    onChange={(e) => setResetPassword(e.target.value)}
-                    className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="reset-confirm" className="block text-sm font-medium text-slate-700 mb-1">
-                    Confirmer le mot de passe
-                  </label>
-                  <input
-                    id="reset-confirm"
-                    type="password"
-                    required
-                    value={resetConfirm}
-                    onChange={(e) => setResetConfirm(e.target.value)}
-                    className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-slate-800 text-white py-2 rounded-lg font-medium hover:bg-slate-900 transition-all"
-                >
-                  {loading ? 'Mise à jour...' : 'Réinitialiser le mot de passe'}
-                </button>
-              </form>
-            )}
-
-            {forgotMode && forgotMessage && (
-              <p className="text-sm text-slate-500">{forgotMessage}</p>
-            )}
-          </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Connexion...' : 'Se connecter'}
+            </button>
+          </form>
         )}
 
         {/* Formulaire d'inscription */}
@@ -465,27 +225,23 @@ const AuthPage = () => {
             </div>
 
             <div>
-              <p className="block text-sm font-medium text-slate-700 mb-2">Rôles</p>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 text-sm text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={registerData.roles.includes('BUYER')}
-                    onChange={() => toggleRole('BUYER')}
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600"
-                  />
-                  Acheteur
-                </label>
-                <label className="flex items-center gap-2 text-sm text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={registerData.roles.includes('SELLER')}
-                    onChange={() => toggleRole('SELLER')}
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600"
-                  />
-                  Vendeur
-                </label>
-              </div>
+              <label htmlFor="register-role" className="block text-sm font-medium text-slate-700 mb-1">
+                Type de compte
+              </label>
+              <select
+                id="register-role"
+                value={registerData.role}
+                onChange={(e) =>
+                  setRegisterData({
+                    ...registerData,
+                    role: e.target.value as 'BUYER' | 'SELLER',
+                  })
+                }
+                className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
+              >
+                <option value="BUYER">Acheteur</option>
+                <option value="SELLER">Vendeur</option>
+              </select>
             </div>
 
             <div>
@@ -500,7 +256,7 @@ const AuthPage = () => {
                 onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                 className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
                 placeholder="••••••••"
-                minLength={8}
+                minLength={6}
               />
             </div>
 
@@ -518,28 +274,16 @@ const AuthPage = () => {
                 }
                 className="w-full border-2 border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
                 placeholder="••••••••"
-                minLength={8}
+                minLength={6}
               />
             </div>
-
-            <label className="flex items-start gap-2 text-sm text-slate-600">
-              <input
-                type="checkbox"
-                checked={registerData.acceptedTerms}
-                onChange={(e) =>
-                  setRegisterData({ ...registerData, acceptedTerms: e.target.checked })
-                }
-                className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600"
-              />
-              J'accepte les conditions et la politique RGPD.
-            </label>
 
             <button
               type="submit"
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Inscription...' : "S'inscrire"}
+              {loading ? 'Inscription...' : 'S&apos;inscrire'}
             </button>
           </form>
         )}
@@ -554,11 +298,10 @@ const AuthPage = () => {
                 onClick={() => {
                   setMode('register');
                   setError(null);
-                  clearAuthMessages();
                 }}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
-                S'inscrire
+                S&apos;inscrire
               </button>
             </p>
           ) : (
@@ -569,7 +312,6 @@ const AuthPage = () => {
                 onClick={() => {
                   setMode('login');
                   setError(null);
-                  clearAuthMessages();
                 }}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >

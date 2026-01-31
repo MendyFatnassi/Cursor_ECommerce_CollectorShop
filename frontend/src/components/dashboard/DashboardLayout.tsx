@@ -1,66 +1,20 @@
-import { useEffect } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import client, { getAuthToken } from '@api/client';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import usePortalStore from '@store/usePortalStore';
-import { UserRole } from '@shared/index';
 
-type NavLinkConfig = { to: string; label: string; roles?: UserRole[]; public?: boolean };
-
-const links: NavLinkConfig[] = [
-  { to: '/acceuil', label: 'Accueil', public: true },
-  { to: '/boutiques', label: 'Boutiques', public: true },
-  { to: '/articles', label: 'Articles', public: true },
-  { to: '/buyer', label: 'Dashboard Acheteur', roles: ['BUYER'] },
-  { to: '/seller', label: 'Dashboard Vendeur', roles: ['SELLER'] },
-  { to: '/chat', label: 'Chat', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-  { to: '/notifications', label: 'Notifications', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-  { to: '/profil', label: 'Profil', roles: ['BUYER', 'SELLER', 'ADMIN'] },
-  { to: '/admin', label: 'Admin', roles: ['ADMIN'] }
+const links = [
+  { to: '/buyer', label: 'Acheteur' },
+  { to: '/seller', label: 'Vendeur' },
+  { to: '/chat', label: 'Chat' },
+  { to: '/notifications', label: 'Notifications' },
+  { to: '/admin', label: 'Admin' }
 ];
 
 const DashboardLayout = () => {
   const profile = usePortalStore((state) => state.profile);
-  const setProfile = usePortalStore((state) => state.setProfile);
   const logout = usePortalStore((state) => state.logout);
-  const location = useLocation();
   const navigate = useNavigate();
-  const roles = profile?.roles ?? [];
-  const visibleLinks = profile
-    ? links.filter((link) => !link.roles || link.roles.some((role) => roles.includes(role)))
-    : links.filter((link) => link.public);
 
-  useEffect(() => {
-    const token = getAuthToken();
-    const isPublicRoute = ['/acceuil', '/boutiques', '/articles'].some((route) =>
-      location.pathname.startsWith(route)
-    );
-    if (!token && !profile) {
-      if (!isPublicRoute) {
-        navigate('/auth');
-      }
-      return;
-    }
-    if (profile || !token) {
-      return;
-    }
-    const loadProfile = async () => {
-      try {
-        const response = await client.get('/profiles/me');
-        setProfile(response.data);
-      } catch {
-        logout();
-        navigate('/auth');
-      }
-    };
-    loadProfile();
-  }, [profile, location.pathname, navigate, logout, setProfile]);
-
-  const handleLogout = async () => {
-    try {
-      await client.post('/auth/logout');
-    } catch {
-      // Ignore logout errors, local cleanup is enough.
-    }
+  const handleLogout = () => {
     logout();
     navigate('/auth');
   };
@@ -85,7 +39,7 @@ const DashboardLayout = () => {
             </div>
             <div className="flex items-center gap-4">
               <nav className="flex gap-2">
-                {visibleLinks.map((link) => (
+                {links.map((link) => (
                   <NavLink
                     key={link.to}
                     to={link.to}
@@ -101,19 +55,12 @@ const DashboardLayout = () => {
                   </NavLink>
                 ))}
               </nav>
-              {profile ? (
+              {profile && (
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                 >
                   Déconnexion
-                </button>
-              ) : (
-                <button
-                  onClick={() => navigate('/auth')}
-                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                >
-                  Connexion
                 </button>
               )}
             </div>

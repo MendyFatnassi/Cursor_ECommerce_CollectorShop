@@ -1,10 +1,6 @@
 services:
   backend:
-    container_name: collector-shop-backend
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
-    image: collector-shop-backend
+    image: maven:3.9-eclipse-temurin-21
     working_dir: /workspace
     volumes:
       - ./backend:/workspace
@@ -14,16 +10,8 @@ services:
       - "8082:8080"
     command: >
       mvn -DskipTests spring-boot:run
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./backend/src
-          target: /workspace/src
-        - action: rebuild
-          path: ./backend/pom.xml
 
   frontend:
-    container_name: collector-shop-frontend
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -34,20 +22,6 @@ services:
     ports:
       # Front servi par nginx sur 80 dans le conteneur
       - "8081:8080"
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend
-          target: /app
-          ignore:
-            - node_modules/
-            - dist/
-            - build/
-            - .git/
-        - action: rebuild
-          path: ./frontend/package.json
-        - action: rebuild
-          path: ./frontend/package-lock.json
 
 volumes:
   m2-cache:
