@@ -1,6 +1,10 @@
 services:
   backend:
-    image: maven:3.9-eclipse-temurin-21
+    container_name: collector-shop-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    image: collector-shop-backend
     working_dir: /workspace
     volumes:
       - ./backend:/workspace
@@ -19,6 +23,7 @@ services:
           path: ./backend/pom.xml
 
   frontend:
+    container_name: collector-shop-frontend
     build:
       context: .
       dockerfile: Dockerfile.dev

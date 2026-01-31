@@ -71,6 +71,8 @@ public class UserProfileService {
         return new UserProfileResponse(
                 user.getId(),
                 user.getFullName(),
+                user.getEmail(),
+                user.isEmailVerified(),
                 roles,
                 locales,
                 user.getReputationScore(),

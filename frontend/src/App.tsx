@@ -6,6 +6,7 @@ import AdminModerationConsole from '@components/admin/AdminModerationConsole';
 import ConversationPanel from '@components/chat/ConversationPanel';
 import NotificationCenter from '@components/notifications/NotificationCenter';
 import AuthPage from '@components/auth/AuthPage';
+import ProfilePage from '@components/profile/ProfilePage';
 import usePortalStore from '@store/usePortalStore';
 import { getAuthToken } from '@api/client';
 import { UserRole } from '@shared/index';
@@ -49,7 +50,7 @@ const RoleGuard = ({ allowedRoles, allowGuest = false, children }: RoleGuardProp
 const App = () => (
   <Routes>
     <Route path="/auth" element={<AuthPage />} />
-    <Route path="/" element={<Navigate to="/auth" replace />} />
+    <Route path="/" element={<Navigate to="/buyer" replace />} />
     <Route element={<DashboardLayout />}>
       <Route
         path="/buyer"
@@ -81,6 +82,14 @@ const App = () => (
         element={
           <RoleGuard allowedRoles={['BUYER', 'SELLER', 'ADMIN']}>
             <NotificationCenter />
+          </RoleGuard>
+        }
+      />
+      <Route
+        path="/profil"
+        element={
+          <RoleGuard allowedRoles={['BUYER', 'SELLER', 'ADMIN']}>
+            <ProfilePage />
           </RoleGuard>
         }
       />

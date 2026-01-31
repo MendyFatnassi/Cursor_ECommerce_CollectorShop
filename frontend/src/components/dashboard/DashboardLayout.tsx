@@ -11,6 +11,7 @@ const links: NavLinkConfig[] = [
   { to: '/acceuil', label: 'Accueil', roles: ['SELLER'] },
   { to: '/chat', label: 'Chat', roles: ['BUYER', 'SELLER', 'ADMIN'] },
   { to: '/notifications', label: 'Notifications', roles: ['BUYER', 'SELLER', 'ADMIN'] },
+  { to: '/profil', label: 'Profil', roles: ['BUYER', 'SELLER', 'ADMIN'] },
   { to: '/admin', label: 'Admin', roles: ['ADMIN'] }
 ];
 
