@@ -1,4 +1,4 @@
-# Collector Shop Platform
+# Collector Shop Platform e-commerce
 
 Documentation projet collectorShop
 
