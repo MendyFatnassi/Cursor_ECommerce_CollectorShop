@@ -1,6 +1,6 @@
 # Collector Shop Platform
 
-Documentation projet collectorshop
+Documentation projet collectorShop
 
 ## Prérequis
 
