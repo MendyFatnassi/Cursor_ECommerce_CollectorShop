@@ -1,5 +1,0 @@
-%% CollectorShop architecture (editable Mermaid diagram)
-graph LR
-  user["Navigateur utilisateur"] --> fe["Frontend (Vite)\nHost :8081 -> Conteneur :8080"]
-  fe -->|/api| api["Backend (Spring Boot)\nHost :8082 -> Conteneur :8080\nEndpoints: /api/auth, /api/profiles, /api/stores"]
-  api --> db["Base de données\nH2 fichier (dev)\nPostgres :5432 (prod)"]

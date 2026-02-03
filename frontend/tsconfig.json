@@ -20,7 +20,9 @@
       "vite/client",
       "react",
       "react-dom",
-      "node"
+      "node",
+      "vitest/globals",
+      "@testing-library/jest-dom"
     ],
     "baseUrl": "./src",
     "paths": {
