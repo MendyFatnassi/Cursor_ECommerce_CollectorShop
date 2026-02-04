@@ -2,6 +2,16 @@ name: CI + Deploy to VPS
 on:
   push:
     branches: [ main, staging ]
+  workflow_call:
+    secrets:
+      DEPLOY_HOST:
+        required: true
+      DEPLOY_USER:
+        required: true
+      DEPLOY_PORT:
+        required: true
+      DEPLOY_SSH_KEY:
+        required: true
 
 jobs:
   ci:
