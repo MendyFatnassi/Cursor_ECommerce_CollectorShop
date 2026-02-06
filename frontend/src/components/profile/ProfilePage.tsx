@@ -99,9 +99,6 @@ const ProfilePage = () => {
               readOnly
               className="w-full border-2 border-slate-100 rounded-lg px-4 py-2 bg-slate-50 text-slate-500"
             />
-            <p className="text-xs text-slate-500 mt-1">
-              {profile?.emailVerified ? 'Email vérifié' : 'Email non vérifié'}
-            </p>
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-slate-700 mb-1">Langues préférées</label>

@@ -24,7 +24,6 @@ import java.util.UUID;
 public class AuthService {
 
     private static final Duration SESSION_TTL = Duration.ofDays(365);
-    private static final Duration VERIFICATION_TTL = Duration.ofHours(24);
     private static final Duration RESET_TTL = Duration.ofHours(1);
 
     private final UserAccountRepository userAccountRepository;
@@ -63,10 +62,11 @@ public class AuthService {
                 roles
         );
         user.setAcceptedTermsAt(Instant.now());
+        user.setEmailVerified(true);
         userAccountRepository.save(user);
 
-        UserToken verification = createToken(user, UserTokenType.EMAIL_VERIFICATION, VERIFICATION_TTL);
-        return new AuthResponse(userProfileService.toProfile(user), null, verification.getToken());
+        UserProfileResponse profile = userProfileService.toProfile(user);
+        return new AuthResponse(profile, null, null);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -78,9 +78,8 @@ public class AuthService {
         }
 
         if (!user.isEmailVerified()) {
-            UserToken verification = ensureVerificationToken(user);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Email non vérifié. Vérifiez votre boîte mail pour activer votre compte. Token: " + verification.getToken());
+            user.setEmailVerified(true);
+            userAccountRepository.save(user);
         }
 
         UserToken session = createToken(user, UserTokenType.SESSION, SESSION_TTL);
@@ -97,16 +96,6 @@ public class AuthService {
                     session.setConsumedAt(Instant.now());
                     userTokenRepository.save(session);
                 });
-    }
-
-    public UserProfileResponse verifyEmail(String token) {
-        UserToken verification = requireActiveToken(token, UserTokenType.EMAIL_VERIFICATION);
-        UserAccount user = verification.getUser();
-        user.setEmailVerified(true);
-        verification.setConsumedAt(Instant.now());
-        userAccountRepository.save(user);
-        userTokenRepository.save(verification);
-        return userProfileService.toProfile(user);
     }
 
     public PasswordResetResponse requestPasswordReset(PasswordForgotRequest request) {
@@ -149,14 +138,6 @@ public class AuthService {
         return userTokenRepository.findByTokenAndType(token, type)
                 .filter(found -> found.isActive(Instant.now()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token invalide ou expiré"));
-    }
-
-    private UserToken ensureVerificationToken(UserAccount user) {
-        return userTokenRepository.findByUserIdAndTypeAndConsumedAtIsNull(user.getId(), UserTokenType.EMAIL_VERIFICATION)
-                .stream()
-                .filter(token -> token.isActive(Instant.now()))
-                .findFirst()
-                .orElseGet(() -> createToken(user, UserTokenType.EMAIL_VERIFICATION, VERIFICATION_TTL));
     }
 
     private Set<UserRole> resolveRoles(Set<UserRole> roles, String role) {

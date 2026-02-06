@@ -1,6 +1,5 @@
 package com.collectorshop.auth;
 
-import com.collectorshop.user.UserProfileResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,11 +33,6 @@ public class AuthController {
     public ResponseEntity<Void> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
         authService.logout(extractBearerToken(authorization));
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/verify-email")
-    public UserProfileResponse verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
-        return authService.verifyEmail(request.token());
     }
 
     @PostMapping("/password/forgot")

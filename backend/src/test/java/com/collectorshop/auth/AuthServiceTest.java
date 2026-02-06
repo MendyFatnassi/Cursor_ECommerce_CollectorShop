@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -83,11 +82,10 @@ class AuthServiceTest {
     }
 
     @Test
-    void registerCreatesVerificationToken() {
+    void registerMarksEmailVerified() {
         when(userAccountRepository.existsByEmailIgnoreCase(anyString())).thenReturn(false);
         when(passwordEncoder.encode("Password1")).thenReturn("hashed");
         when(userAccountRepository.save(any(UserAccount.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(userTokenRepository.save(any(UserToken.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(userProfileService.toProfile(any(UserAccount.class))).thenReturn(sampleProfile());
 
         RegisterRequest request = new RegisterRequest(
@@ -101,29 +99,31 @@ class AuthServiceTest {
 
         AuthResponse response = authService.register(request);
 
-        assertNotNull(response.verificationToken());
+        assertNull(response.verificationToken());
         assertNull(response.token());
         ArgumentCaptor<UserAccount> userCaptor = ArgumentCaptor.forClass(UserAccount.class);
         verify(userAccountRepository).save(userCaptor.capture());
         assertEquals("user@example.com", userCaptor.getValue().getEmail());
+        assertTrue(userCaptor.getValue().isEmailVerified());
     }
 
     @Test
-    void loginRejectsUnverifiedEmail() {
+    void loginAllowsUnverifiedEmail() {
         UserAccount user = sampleUser(false);
         when(userAccountRepository.findByEmailIgnoreCase("user@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("Password1", "hash")).thenReturn(true);
-        when(userTokenRepository.findByUserIdAndTypeAndConsumedAtIsNull(eq(user.getId()), eq(UserTokenType.EMAIL_VERIFICATION)))
-                .thenReturn(List.of());
         when(userTokenRepository.save(any(UserToken.class))).thenReturn(
-                new UserToken(user, "verification-token", UserTokenType.EMAIL_VERIFICATION, Instant.now().plusSeconds(3600))
+                new UserToken(user, "session-token", UserTokenType.SESSION, Instant.now().plusSeconds(3600))
         );
+        when(userProfileService.toProfile(user)).thenReturn(sampleProfile());
 
         LoginRequest request = new LoginRequest("user@example.com", "Password1");
-        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> authService.login(request));
+        AuthResponse response = authService.login(request);
 
-        assertEquals(HttpStatus.FORBIDDEN, ex.getStatusCode());
-        assertTrue(ex.getReason().contains("verification-token"));
+        assertEquals("session-token", response.token());
+        assertNull(response.verificationToken());
+        assertTrue(user.isEmailVerified());
+        verify(userAccountRepository).save(user);
     }
 
     @Test
