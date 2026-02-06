@@ -2,7 +2,7 @@ services:
   mysql:
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-collectorshop}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-collectorshop_staging}
       MYSQL_USER: ${MYSQL_USER:-collectorshop_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -35,6 +35,7 @@ services:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-mysql}
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-collectorshop_staging}
       - MYSQL_USER=${MYSQL_USER:-collectorshop_user}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ports:
