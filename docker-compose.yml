@@ -2,7 +2,7 @@ services:
   mysql:
     image: mysql:8.4
     environment:
-      MYSQL_DATABASE: collectorshop
+      MYSQL_DATABASE: collectorshop_dev
       MYSQL_USER: collectorshop_user
       MYSQL_PASSWORD: collectorshop_password
       MYSQL_ROOT_PASSWORD: root_password
@@ -39,6 +39,7 @@ services:
       - SPRING_PROFILES_ACTIVE=mysql
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
+      - MYSQL_DATABASE=collectorshop_dev
       - MYSQL_USER=collectorshop_user
       - MYSQL_PASSWORD=collectorshop_password
     develop:
@@ -56,7 +57,7 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile.dev
     depends_on:
       - backend

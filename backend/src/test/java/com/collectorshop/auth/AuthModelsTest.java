@@ -26,7 +26,6 @@ class AuthModelsTest {
         LoginRequest loginRequest = new LoginRequest("user@example.com", "Password1");
         PasswordForgotRequest forgotRequest = new PasswordForgotRequest("user@example.com");
         PasswordResetRequest resetRequest = new PasswordResetRequest("token", "Password1");
-        VerifyEmailRequest verifyEmailRequest = new VerifyEmailRequest("token");
         PasswordResetResponse resetResponse = new PasswordResetResponse("ok", "token");
         UserProfileResponse profile = new UserProfileResponse(
                 UUID.randomUUID(),
@@ -44,7 +43,6 @@ class AuthModelsTest {
         assertEquals("user@example.com", loginRequest.email());
         assertEquals("ok", resetResponse.message());
         assertEquals("session", authResponse.token());
-        assertEquals("token", verifyEmailRequest.token());
         assertEquals("token", resetRequest.token());
         assertEquals("user@example.com", forgotRequest.email());
     }
