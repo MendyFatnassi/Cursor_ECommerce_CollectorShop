@@ -23,7 +23,7 @@ import java.util.UUID;
 @Service
 public class AuthService {
 
-    private static final Duration SESSION_TTL = Duration.ofDays(7);
+    private static final Duration SESSION_TTL = Duration.ofDays(365);
     private static final Duration VERIFICATION_TTL = Duration.ofHours(24);
     private static final Duration RESET_TTL = Duration.ofHours(1);
 

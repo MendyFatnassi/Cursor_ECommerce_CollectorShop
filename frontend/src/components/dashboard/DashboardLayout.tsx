@@ -1,22 +1,29 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import usePortalStore from '@store/usePortalStore';
 
-const links = [
-  { to: '/buyer', label: 'Acheteur' },
-  { to: '/seller', label: 'Vendeur' },
-  { to: '/chat', label: 'Chat' },
-  { to: '/notifications', label: 'Notifications' },
-  { to: '/admin', label: 'Admin' }
-];
-
 const DashboardLayout = () => {
   const profile = usePortalStore((state) => state.profile);
   const logout = usePortalStore((state) => state.logout);
   const navigate = useNavigate();
+  const roles = profile?.roles ?? [];
+  const isBuyer = roles.includes('BUYER');
+  const isSeller = roles.includes('SELLER');
+  const isAdmin = roles.includes('ADMIN');
+
+  const links = [
+    { to: '/accueil', label: 'Accueil', visible: true },
+    { to: '/buyer', label: 'Dashboard Acheteur', visible: isBuyer },
+    { to: '/seller', label: 'Dashboard Vendeur', visible: isSeller },
+    { to: '/chat', label: 'Chat', visible: Boolean(profile) },
+    { to: '/notifications', label: 'Notifications', visible: Boolean(profile) },
+    { to: '/profil', label: 'Profil', visible: Boolean(profile) },
+    { to: '/admin', label: 'Admin', visible: isAdmin },
+    { to: '/auth', label: 'Connexion', visible: !profile }
+  ];
 
   const handleLogout = () => {
     logout();
-    navigate('/auth');
+    navigate('/accueil');
   };
 
   return (
@@ -39,21 +46,23 @@ const DashboardLayout = () => {
             </div>
             <div className="flex items-center gap-4">
               <nav className="flex gap-2">
-                {links.map((link) => (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    className={({ isActive }) =>
-                      `px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
-                        isActive
-                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105'
-                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                      }`
-                    }
-                  >
-                    {link.label}
-                  </NavLink>
-                ))}
+                {links
+                  .filter((link) => link.visible)
+                  .map((link) => (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      className={({ isActive }) =>
+                        `px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                          isActive
+                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md scale-105'
+                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        }`
+                      }
+                    >
+                      {link.label}
+                    </NavLink>
+                  ))}
               </nav>
               {profile && (
                 <button

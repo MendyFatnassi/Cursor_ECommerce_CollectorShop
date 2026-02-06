@@ -1,10 +1,53 @@
 services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: collectorshop
+      MYSQL_USER: collectorshop_user
+      MYSQL_PASSWORD: collectorshop_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    depends_on:
+      - mysql
+    ports:
+      - "8083:8978"
+    volumes:
+      - cloudbeaver-data:/opt/cloudbeaver/workspace
+
   backend:
-    image: maven:3.9-eclipse-temurin-21
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - mysql
     working_dir: /workspace
     volumes:
       - ./backend:/workspace
       - m2-cache:/root/.m2
+    environment:
+      - SPRING_PROFILES_ACTIVE=mysql
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=collectorshop_user
+      - MYSQL_PASSWORD=collectorshop_password
+    develop:
+      watch:
+        - path: ./backend/src
+          target: /workspace/src
+          action: sync+restart
+        - path: ./backend/pom.xml
+          action: rebuild
     ports:
       # 8080 hôte est souvent déjà utilisé (Spring/containers). On expose sur 8082 côté hôte.
       - "8082:8080"
@@ -13,16 +56,25 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile.dev
     depends_on:
       - backend
     environment:
       - VITE_API_URL=http://backend:8080
+    develop:
+      watch:
+        - path: ./frontend
+          target: /app
+          action: sync+restart
+          ignore:
+            - node_modules/
     ports:
       # Front servi par nginx sur 80 dans le conteneur
       - "8081:8080"
 
 volumes:
   m2-cache:
+  mysql-data:
+  cloudbeaver-data:
 

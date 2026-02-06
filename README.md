@@ -1,6 +1,6 @@
-# Collector Shop Platform
+# Collector Shop Platform e-commerce
 
-Plateforme e-commerce pour collectionneurs avec backend Spring Boot et frontend React.
+Documentation projet collectorShop
 
 ## Prérequis
 

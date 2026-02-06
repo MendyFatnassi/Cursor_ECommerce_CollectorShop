@@ -1,0 +1,24 @@
+# Configuration MySQL (données persistantes)
+spring:
+  application:
+    name: collector-shop
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/collectorshop?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${MYSQL_USER:collectorshop_user}
+    password: ${MYSQL_PASSWORD:collectorshop_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+  h2:
+    console:
+      enabled: false
+
+collector:
+  fraud:
+    outbound-url: https://fraud-gateway.example.com/hooks
