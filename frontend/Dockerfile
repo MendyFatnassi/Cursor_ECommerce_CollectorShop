@@ -5,13 +5,13 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copier uniquement les fichiers nécessaires pour installer les dépendances
-COPY frontend/package.json frontend/package-lock.json* ./
+COPY package.json package-lock.json* ./
 
 # Installer les dépendances (utilise npm ci si le lockfile existe, sinon npm install)
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Copier le reste du code frontend (y compris index.html, src, vite.config, etc.)
-COPY frontend/ .
+COPY . .
 
 # Construire l'application pour la prod
 RUN npm run build
@@ -20,9 +20,8 @@ RUN npm run build
 FROM nginx:stable-alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
-
