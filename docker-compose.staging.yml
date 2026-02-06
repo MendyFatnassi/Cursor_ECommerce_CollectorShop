@@ -6,6 +6,8 @@ services:
       MYSQL_USER: ${MYSQL_USER:-collectorshop_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3307:3306"
     volumes:
       - mysql-data-staging:/var/lib/mysql
     healthcheck:
