@@ -3,7 +3,7 @@ spring:
   application:
     name: collector-shop
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/collectorshop?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:collectorshop}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${MYSQL_USER:collectorshop_user}
     password: ${MYSQL_PASSWORD:collectorshop_password}
     driver-class-name: com.mysql.cj.jdbc.Driver

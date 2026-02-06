@@ -65,12 +65,13 @@ docker compose up --build
 ```
 
 La configuration est gérée par `application-mysql.yml` et le profil `mysql`.
+Le nom de la base est configuré via `MYSQL_DATABASE` (par défaut `collectorshop_dev` en local).
 
 Pour visualiser la base en interface web, un service CloudBeaver est aussi disponible :
 - URL : http://localhost:8083
 - Hôte MySQL : `mysql`
 - Port : `3306`
-- Base : `collectorshop`
+- Base : `collectorshop_dev` (ou la valeur de `MYSQL_DATABASE`)
 - Utilisateur : `collectorshop_user`
 - Mot de passe : `collectorshop_password`
 Si vous obtenez l'erreur "Public Key Retrieval is not allowed", vous avez deux options :
@@ -82,9 +83,9 @@ Si vous obtenez l'erreur "Public Key Retrieval is not allowed", vous avez deux o
 1. **Installer MySQL** (via l'installeur officiel)
 2. **Créer la base et l'utilisateur :**
    ```sql
-   CREATE DATABASE collectorshop;
+   CREATE DATABASE collectorshop_dev;
    CREATE USER 'collectorshop_user'@'%' IDENTIFIED BY 'collectorshop_password';
-   GRANT ALL PRIVILEGES ON collectorshop.* TO 'collectorshop_user'@'%';
+   GRANT ALL PRIVILEGES ON collectorshop_dev.* TO 'collectorshop_user'@'%';
    FLUSH PRIVILEGES;
    ```
 3. **Le profil `mysql` est le profil par défaut.** Si besoin, vous pouvez le forcer :
@@ -111,7 +112,7 @@ Si vous obtenez l'erreur "Public Key Retrieval is not allowed", vous avez deux o
 ### MySQL
 ```bash
 # Se connecter avec MySQL
-mysql -h localhost -u collectorshop_user -p collectorshop
+mysql -h localhost -u collectorshop_user -p collectorshop_dev
 
 # Lister les tables
 SHOW TABLES;
@@ -134,7 +135,7 @@ Si vous avez déjà des données en mémoire H2 et voulez les migrer :
 
 2. Importer dans MySQL :
    ```bash
-   mysql -h localhost -u collectorshop_user -p collectorshop < export.sql
+mysql -h localhost -u collectorshop_user -p collectorshop_dev < export.sql
    ```
 
 ---
