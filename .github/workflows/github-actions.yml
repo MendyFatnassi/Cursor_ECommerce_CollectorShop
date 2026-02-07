@@ -1,8 +1,11 @@
 name: CI
 run-name: CI (tests + couverture)
 on:
-  pull_request:
-    branches: [ main, staging ]
+  workflow_call: {}
+  push:
+    branches-ignore:
+      - main
+      - staging
 jobs:
   CI:
     runs-on: ubuntu-24.04
