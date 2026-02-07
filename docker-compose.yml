@@ -105,6 +105,7 @@ services:
       - "--kafka.server=kafka:29092"
     ports:
       - "9308:9308"
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:v2.54.1
