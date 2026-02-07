@@ -16,6 +16,14 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+    enable:
+      all: false
+      "http.server.requests": true
+      "jvm": true
+      "process": true
+      "system": true
+      "tomcat": true
+      "hikaricp": true
 
 
 

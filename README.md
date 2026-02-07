@@ -67,6 +67,32 @@ Le backend expose les métriques Prometheus sur :
 > **Note** : Vous pouvez changer le compte Grafana via `GRAFANA_ADMIN_USER` et `GRAFANA_ADMIN_PASSWORD`.
 > En staging, les ports diffèrent (ex. Prometheus `19090`, Grafana `9300`, Kafka `19092`).
 
+### URLs par environnement
+
+#### Local (dev)
+- Grafana : http://localhost:3000
+- Prometheus : http://localhost:9090
+- Prometheus targets : http://localhost:9090/targets
+- Backend metrics : http://localhost:8082/actuator/prometheus
+- Kafka (broker) : localhost:9092
+- Kafka Exporter (metrics) : http://localhost:9308/metrics
+
+#### Staging
+- Grafana : http://localhost:9300
+- Prometheus : http://localhost:19090
+- Prometheus targets : http://localhost:19090/targets
+- Backend metrics : http://localhost:9082/actuator/prometheus
+- Kafka (broker) : localhost:19092
+- Kafka Exporter (metrics) : http://localhost:19308/metrics
+
+#### Prod
+- Grafana : http://localhost:3000
+- Prometheus : http://localhost:9090
+- Prometheus targets : http://localhost:9090/targets
+- Backend metrics : http://localhost:8082/actuator/prometheus
+- Kafka : non present en prod
+- CloudBeaver : non present en prod
+
 #### Kafka en mode KRaft (sans ZooKeeper)
 
 Le cluster Kafka utilise `KAFKA_CLUSTER_ID` (défini dans `.env`).
