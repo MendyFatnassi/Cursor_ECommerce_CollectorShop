@@ -8,6 +8,15 @@ collector:
   fraud:
     outbound-url: https://fraud-gateway.example.com/hooks
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 
 
 
