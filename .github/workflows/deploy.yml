@@ -1,7 +1,7 @@
 name: CI + Deploy to VPS
 on:
   push:
-    branches: [ main, staging, develop ]
+    branches: [ main, staging ]
   workflow_call:
     secrets:
       DEPLOY_HOST:

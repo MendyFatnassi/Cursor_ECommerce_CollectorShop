@@ -2,9 +2,9 @@ name: CI
 run-name: CI (tests + couverture)
 on:
   push:
-    branches-ignore: [ main, staging, develop ]
+    branches-ignore: [ main, staging ]
   pull_request:
-    branches: [ main, staging, develop ]
+    branches: [ develop, main, staging ]
   workflow_call:
 jobs:
   CI:
