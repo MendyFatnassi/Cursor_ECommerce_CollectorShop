@@ -86,7 +86,7 @@ services:
     restart: unless-stopped
 
   kafka-exporter:
-    image: prom/kafka-exporter:v1.8.0
+    image: danielqsj/kafka-exporter:v1.8.0
     depends_on:
       - kafka
     command:
