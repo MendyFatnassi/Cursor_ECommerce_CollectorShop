@@ -95,13 +95,30 @@ services:
       - "19308:9308"
     restart: unless-stopped
 
+  node-exporter:
+    image: prom/node-exporter:v1.8.1
+    command:
+      - "--path.rootfs=/host"
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus:v2.54.1
     depends_on:
       - backend
       - kafka-exporter
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus.staging.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data-staging:/prometheus
     ports:
       - "19090:9090"

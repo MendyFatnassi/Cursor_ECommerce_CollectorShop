@@ -15,16 +15,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  cloudbeaver:
-    image: dbeaver/cloudbeaver:latest
-    depends_on:
-      - mysql
-    ports:
-      - "8083:8978"
-    volumes:
-      - cloudbeaver-data:/opt/cloudbeaver/workspace
-    restart: unless-stopped
-
   backend:
     build:
       context: ./backend
@@ -52,54 +42,29 @@ services:
       - "8081:80"
     restart: unless-stopped
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.1
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    volumes:
-      - zookeeper-data:/var/lib/zookeeper
-    restart: unless-stopped
-
-  kafka:
-    image: confluentinc/cp-kafka:7.6.1
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    volumes:
-      - kafka-data:/var/lib/kafka/data
-    restart: unless-stopped
-
-  kafka-exporter:
-    image: prom/kafka-exporter:v1.8.0
-    depends_on:
-      - kafka
+  node-exporter:
+    image: prom/node-exporter:v1.8.1
     command:
-      - "--kafka.server=kafka:29092"
-    ports:
-      - "9308:9308"
+      - "--path.rootfs=/host"
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
     restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:v2.54.1
     depends_on:
       - backend
-      - kafka-exporter
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"
@@ -122,8 +87,5 @@ services:
 
 volumes:
   mysql-data:
-  cloudbeaver-data:
-  zookeeper-data:
-  kafka-data:
   prometheus-data:
   grafana-data:
