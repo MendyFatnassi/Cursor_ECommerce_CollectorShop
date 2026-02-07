@@ -15,16 +15,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  cloudbeaver:
-    image: dbeaver/cloudbeaver:latest
-    depends_on:
-      - mysql
-    ports:
-      - "8083:8978"
-    volumes:
-      - cloudbeaver-data:/opt/cloudbeaver/workspace
-    restart: unless-stopped
-
   backend:
     build:
       context: ./backend
@@ -52,6 +42,50 @@ services:
       - "8081:80"
     restart: unless-stopped
 
+  node-exporter:
+    image: prom/node-exporter:v1.8.1
+    command:
+      - "--path.rootfs=/host"
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    depends_on:
+      - backend
+    volumes:
+      - ./monitoring/prometheus.prod.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
 volumes:
   mysql-data:
-  cloudbeaver-data:
+  prometheus-data:
+  grafana-data:
