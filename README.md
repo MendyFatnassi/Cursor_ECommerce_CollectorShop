@@ -52,11 +52,13 @@ Le frontend sera accessible sur : **http://localhost:8080**
 
 ```bash
 # À la racine du projet
-docker-compose up
+copy .env.local.example .env.local
+docker compose --env-file .env.local -f docker-compose.local.yml up -d --build
 ```
 
 - Backend : http://localhost:8082
 - Frontend : http://localhost:8081
+- Keycloak : http://localhost:8180
 - Kafka : localhost:9092
 - Prometheus : http://localhost:9090
 - Grafana : http://localhost:3000 (admin/admin par défaut)
@@ -77,6 +79,7 @@ Le backend expose les métriques Prometheus sur :
 - Backend metrics : http://localhost:8082/actuator/prometheus
 - Kafka (broker) : localhost:9092
 - Kafka Exporter (metrics) : http://localhost:9308/metrics
+ - Keycloak : http://localhost:8180
 
 #### Staging
 - Grafana : http://localhost:9300

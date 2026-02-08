@@ -111,6 +111,7 @@ services:
 
   node-exporter:
     image: prom/node-exporter:v1.8.1
+    profiles: ["linux-metrics"]
     command:
       - "--path.rootfs=/host"
     volumes:
@@ -119,6 +120,7 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
+    profiles: ["linux-metrics"]
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro

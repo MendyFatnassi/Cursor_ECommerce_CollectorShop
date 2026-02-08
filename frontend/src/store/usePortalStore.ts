@@ -32,7 +32,8 @@ const usePortalStore = create<PortalState>((set) => ({
   logout: () => {
     set({ profile: undefined, listings: [], stores: [], chatThreads: [], notificationPrefs: [] });
     if (keycloak.authenticated) {
-      void keycloak.logout();
+      const redirectUri = `${window.location.origin}/accueil`;
+      void keycloak.logout({ redirectUri });
     }
   },
 }));
