@@ -1,21 +1,33 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { beforeEach, vi } from 'vitest';
 import App from './App';
-import client, { getAuthToken } from '@api/client';
+import client from '@api/client';
+
+const useKeycloakMock = vi.fn();
+
+vi.mock('@react-keycloak/web', () => ({
+  useKeycloak: () => useKeycloakMock()
+}));
 
 vi.mock('@api/client', () => ({
   default: {
     get: vi.fn()
-  },
-  getAuthToken: vi.fn(() => null),
-  setAuthToken: vi.fn()
+  }
 }));
 
 describe('App', () => {
+  beforeEach(() => {
+    useKeycloakMock.mockReset();
+  });
+
   it('redirige vers l’accueil pour un visiteur', () => {
     const clientMock = vi.mocked(client);
     clientMock.get.mockResolvedValue({ data: [] });
+    useKeycloakMock.mockReturnValue({
+      keycloak: { authenticated: false },
+      initialized: true
+    });
 
     render(
       <MemoryRouter initialEntries={['/']}>
@@ -28,8 +40,10 @@ describe('App', () => {
 
   it('charge le profil si un token existe', async () => {
     const clientMock = vi.mocked(client);
-    const getAuthTokenMock = vi.mocked(getAuthToken);
-    getAuthTokenMock.mockReturnValue('token');
+    useKeycloakMock.mockReturnValue({
+      keycloak: { authenticated: true },
+      initialized: true
+    });
     clientMock.get.mockImplementation((url: string) => {
       if (url === '/profiles/me') {
         return Promise.resolve({

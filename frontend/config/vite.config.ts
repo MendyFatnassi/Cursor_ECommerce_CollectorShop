@@ -29,6 +29,7 @@ export default defineConfig({
     alias: {
       '@components': path.resolve(__dirname, '../src/components'),
       '@api': path.resolve(__dirname, '../src/api'),
+      '@auth': path.resolve(__dirname, '../src/auth'),
       '@shared': path.resolve(__dirname, '../src/types'),
       '@store': path.resolve(__dirname, '../src/store')
     }

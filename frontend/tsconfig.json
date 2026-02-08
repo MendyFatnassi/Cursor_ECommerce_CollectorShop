@@ -32,6 +32,9 @@
       "@api/*": [
         "api/*"
       ],
+      "@auth/*": [
+        "auth/*"
+      ],
       "@shared/*": [
         "types/*"
       ],
