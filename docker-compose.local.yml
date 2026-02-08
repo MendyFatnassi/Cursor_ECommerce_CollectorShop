@@ -25,12 +25,24 @@ services:
     volumes:
       - cloudbeaver-data:/opt/cloudbeaver/workspace
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+    ports:
+      - "8180:8080"
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
     depends_on:
       - mysql
+      - keycloak
     working_dir: /workspace
     volumes:
       - ./backend:/workspace
@@ -42,6 +54,9 @@ services:
       - MYSQL_DATABASE=collectorshop_dev
       - MYSQL_USER=collectorshop_user
       - MYSQL_PASSWORD=collectorshop_password
+      - COLLECTOR_AUTH_MODE=${COLLECTOR_AUTH_MODE:-keycloak}
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - KEYCLOAK_JWK_SET_URI=${KEYCLOAK_JWK_SET_URI}
     develop:
       watch:
         - path: ./backend/src
@@ -63,6 +78,9 @@ services:
       - backend
     environment:
       - VITE_API_URL=http://backend:8080
+      - VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL:-http://localhost:8180}
+      - VITE_KEYCLOAK_REALM=${VITE_KEYCLOAK_REALM:-collectorshop}
+      - VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID:-collector-shop-frontend}
     develop:
       watch:
         - path: ./frontend
@@ -155,7 +173,7 @@ volumes:
   m2-cache:
   mysql-data:
   cloudbeaver-data:
+  keycloak-data:
   kafka-data:
   prometheus-data:
   grafana-data:
-

@@ -1,6 +1,6 @@
 package com.collectorshop.portal;
 
-import com.collectorshop.auth.UserPrincipal;
+import com.collectorshop.auth.KeycloakJwtHelper;
 import com.collectorshop.shared.model.Listing;
 import com.collectorshop.user.ProfileUpdateRequest;
 import com.collectorshop.user.UserProfileResponse;
@@ -8,6 +8,7 @@ import com.collectorshop.user.UserProfileService;
 import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,14 +33,19 @@ public class PortalController {
     }
 
     @GetMapping("/profiles/me")
-    public UserProfileResponse profile(@AuthenticationPrincipal UserPrincipal principal) {
-        return userProfileService.getProfile(principal.id());
+    public UserProfileResponse profile(@AuthenticationPrincipal Jwt jwt) {
+        return userProfileService.toProfile(userProfileService.ensureUser(
+                KeycloakJwtHelper.extractEmail(jwt),
+                KeycloakJwtHelper.extractFullName(jwt),
+                KeycloakJwtHelper.extractUserRoles(jwt),
+                KeycloakJwtHelper.isEmailVerified(jwt)
+        ));
     }
 
     @PatchMapping("/profiles/me")
-    public UserProfileResponse updateProfile(@AuthenticationPrincipal UserPrincipal principal,
+    public UserProfileResponse updateProfile(@AuthenticationPrincipal Jwt jwt,
                                              @Valid @RequestBody ProfileUpdateRequest request) {
-        return userProfileService.updateProfile(principal.id(), request);
+        return userProfileService.updateProfileByEmail(KeycloakJwtHelper.extractEmail(jwt), request);
     }
 
     @GetMapping("/recommendations")
@@ -49,8 +55,8 @@ public class PortalController {
 
     @PostMapping("/profiles/interests")
     @ResponseStatus(HttpStatus.CREATED)
-    public List<String> addInterest(@AuthenticationPrincipal UserPrincipal principal, @RequestBody Map<String, String> body) {
-        return userProfileService.addInterest(principal.id(), body.getOrDefault("tag", ""));
+    public List<String> addInterest(@AuthenticationPrincipal Jwt jwt, @RequestBody Map<String, String> body) {
+        return userProfileService.addInterestByEmail(KeycloakJwtHelper.extractEmail(jwt), body.getOrDefault("tag", ""));
     }
 
     @GetMapping("/ads/slots")
