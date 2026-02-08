@@ -38,17 +38,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - backend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.collectorshop-prod.rule=Host(`collectorshop.cloud`,`www.collectorshop.cloud`)"
-      - "traefik.http.routers.collectorshop-prod.entrypoints=websecure"
-      - "traefik.http.routers.collectorshop-prod.tls=true"
-      - "traefik.http.routers.collectorshop-prod.tls.certresolver=le"
-      - "traefik.http.services.collectorshop-prod.loadbalancer.server.port=80"
-      - "traefik.docker.network=proxy"
-    networks:
-      - default
-      - proxy
+    ports:
+      - "8081:80"
     restart: unless-stopped
 
   node-exporter:
@@ -98,7 +89,3 @@ volumes:
   mysql-data-prod:
   prometheus-data-prod:
   grafana-data-prod:
-
-networks:
-  proxy:
-    external: true
