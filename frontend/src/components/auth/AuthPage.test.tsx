@@ -1,18 +1,26 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { vi } from 'vitest';
+import { beforeEach, vi } from 'vitest';
 import AuthPage from './AuthPage';
 
-vi.mock('@api/client', () => ({
+const loginMock = vi.fn();
+const registerMock = vi.fn();
+
+vi.mock('@auth/keycloak', () => ({
   default: {
-    post: vi.fn()
-  },
-  setAuthToken: vi.fn()
+    login: loginMock,
+    register: registerMock
+  }
 }));
 
 describe('AuthPage', () => {
-  it('affiche une erreur si les conditions ne sont pas acceptées', async () => {
+  beforeEach(() => {
+    loginMock.mockClear();
+    registerMock.mockClear();
+  });
+
+  it('redirige vers Keycloak pour la connexion', async () => {
     const user = userEvent.setup();
     render(
       <MemoryRouter>
@@ -20,14 +28,21 @@ describe('AuthPage', () => {
       </MemoryRouter>
     );
 
-    await user.click(screen.getByRole('button', { name: 'Inscription' }));
-    await user.type(screen.getByLabelText('Nom complet'), 'Jean Dupont');
-    await user.type(screen.getByLabelText('Email'), 'user@example.com');
-    await user.type(screen.getByLabelText('Mot de passe'), 'Password1');
-    await user.type(screen.getByLabelText('Confirmer le mot de passe'), 'Password1');
+    await user.click(screen.getByRole('button', { name: 'Se connecter' }));
 
-    await user.click(screen.getByRole('button', { name: "S'inscrire" }));
+    expect(loginMock).toHaveBeenCalled();
+  });
 
-    expect(screen.getByText('Vous devez accepter les conditions')).toBeInTheDocument();
+  it("redirige vers Keycloak pour l'inscription", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <AuthPage />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Créer un compte' }));
+
+    expect(registerMock).toHaveBeenCalled();
   });
 });

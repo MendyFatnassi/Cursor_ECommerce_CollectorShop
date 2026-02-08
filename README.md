@@ -94,6 +94,57 @@ Le backend expose les métriques Prometheus sur :
 - Kafka : non present en prod
 - CloudBeaver : non present en prod
 
+### Keycloak (prod + staging)
+
+Deux instances Keycloak sont prévues (une par environnement).
+Le `docker-compose.prod.yml` utilise PostgreSQL et `start`. Le staging reste en `start-dev` par simplicité.
+
+#### DNS
+- `auth.collectorshop.cloud` → IP du VPS (Keycloak prod)
+- `auth.staging.collectorshop.cloud` → IP du VPS (Keycloak staging)
+
+#### Caddy (reverse proxy HTTPS)
+```
+auth.collectorshop.cloud {
+  reverse_proxy localhost:8080
+}
+
+auth.staging.collectorshop.cloud {
+  reverse_proxy localhost:8180
+}
+```
+
+#### Variables d'environnement
+Dans `.env.prod` :
+```
+COLLECTOR_AUTH_MODE=keycloak
+KEYCLOAK_ISSUER_URI=https://auth.collectorshop.cloud/realms/collectorshop
+KEYCLOAK_HOSTNAME=auth.collectorshop.cloud
+VITE_KEYCLOAK_URL=https://auth.collectorshop.cloud
+VITE_KEYCLOAK_REALM=collectorshop
+VITE_KEYCLOAK_CLIENT_ID=collector-shop-frontend
+```
+
+Dans `.env.staging` :
+```
+COLLECTOR_AUTH_MODE=keycloak
+KEYCLOAK_ISSUER_URI=https://auth.staging.collectorshop.cloud/realms/collectorshop
+KEYCLOAK_HOSTNAME=auth.staging.collectorshop.cloud
+VITE_KEYCLOAK_URL=https://auth.staging.collectorshop.cloud
+VITE_KEYCLOAK_REALM=collectorshop
+VITE_KEYCLOAK_CLIENT_ID=collector-shop-frontend
+```
+
+#### Configuration Keycloak
+- Créer le realm : `collectorshop`
+- Créer un client public : `collector-shop-frontend`
+- Activer `Valid Redirect URIs` :
+  - `https://collectorshop.cloud/*`
+  - `https://staging.collectorshop.cloud/*`
+- Rôles à créer dans le realm : `BUYER`, `SELLER`, `ADMIN`
+- Au premier login, le backend crée l'utilisateur local si besoin.
+- Assurez-vous que le token contient l'email (`email` scope activé).
+
 #### Kafka en mode KRaft (sans ZooKeeper)
 
 Le cluster Kafka utilise `KAFKA_CLUSTER_ID` (défini dans `.env`).

@@ -3,10 +3,17 @@ spring:
     name: collector-shop
   profiles:
     default: mysql
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:}
 
 collector:
   fraud:
     outbound-url: https://fraud-gateway.example.com/hooks
+  auth:
+    mode: ${COLLECTOR_AUTH_MODE:legacy}
 
 management:
   endpoints:

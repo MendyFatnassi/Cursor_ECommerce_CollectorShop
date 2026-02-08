@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { UserProfile, ListingSummary, ChatThread, NotificationPreference, SellerStore } from '@shared/index';
-import { setAuthToken } from '@api/client';
+import keycloak from '@auth/keycloak';
 
 interface PortalState {
   profile?: UserProfile;
@@ -30,8 +30,10 @@ const usePortalStore = create<PortalState>((set) => ({
       return { notificationPrefs: next };
     }),
   logout: () => {
-    setAuthToken(null);
     set({ profile: undefined, listings: [], stores: [], chatThreads: [], notificationPrefs: [] });
+    if (keycloak.authenticated) {
+      void keycloak.logout();
+    }
   },
 }));
 

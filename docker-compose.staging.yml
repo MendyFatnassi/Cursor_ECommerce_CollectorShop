@@ -40,6 +40,8 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE:-collectorshop_staging}
       - MYSQL_USER=${MYSQL_USER:-collectorshop_user}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - COLLECTOR_AUTH_MODE=${COLLECTOR_AUTH_MODE:-keycloak}
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
     ports:
       - "9082:8080"
     restart: unless-stopped
@@ -48,10 +50,29 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL}
+        VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM}
+        VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID}
     depends_on:
       - backend
     ports:
       - "9081:80"
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_PROXY: edge
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+    ports:
+      - "8180:8080"
+    volumes:
+      - keycloak-data-staging:/opt/keycloak/data
     restart: unless-stopped
 
   kafka:
@@ -138,3 +159,4 @@ volumes:
   kafka-data-staging:
   prometheus-data-staging:
   grafana-data-staging:
+  keycloak-data-staging:
