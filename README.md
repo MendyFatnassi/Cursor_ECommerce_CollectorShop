@@ -94,48 +94,6 @@ Le backend expose les métriques Prometheus sur :
 - Kafka : non present en prod
 - CloudBeaver : non present en prod
 
-### Reverse proxy (prod + staging sur le même VPS)
-
-Utilisez Traefik pour router par domaine :
-
-- `collectorshop.cloud` et `www.collectorshop.cloud` → prod
-- `staging.collectorshop.cloud` → staging
-
-#### 1) DNS
-
-Créez des enregistrements `A` pour :
-
-- `collectorshop.cloud` → IP du VPS
-- `www.collectorshop.cloud` → IP du VPS
-- `staging.collectorshop.cloud` → IP du VPS
-
-#### 2) Lancer le proxy
-
-Créez le fichier ACME pour Let's Encrypt :
-
-```bash
-mkdir -p traefik
-touch traefik/acme.json
-chmod 600 traefik/acme.json
-```
-
-Définissez votre email (Let's Encrypt) :
-
-```bash
-export LETSENCRYPT_EMAIL="contact@collectorshop.cloud"
-```
-
-```bash
-docker compose -f docker-compose.proxy.yml up -d
-```
-
-#### 3) Lancer prod et staging
-
-```bash
-docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
-docker compose --env-file .env.staging -f docker-compose.staging.yml up -d --build
-```
-
 #### Kafka en mode KRaft (sans ZooKeeper)
 
 Le cluster Kafka utilise `KAFKA_CLUSTER_ID` (défini dans `.env`).
