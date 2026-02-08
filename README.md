@@ -66,6 +66,7 @@ Le backend expose les métriques Prometheus sur :
 
 > **Note** : Vous pouvez changer le compte Grafana via `GRAFANA_ADMIN_USER` et `GRAFANA_ADMIN_PASSWORD`.
 > En staging, les ports diffèrent (ex. Prometheus `19090`, Grafana `9300`, Kafka `19092`).
+> Si prod + staging tournent sur le même VPS, utilisez un reverse proxy (voir plus bas).
 
 ### URLs par environnement
 
