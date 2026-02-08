@@ -4,8 +4,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, vi } from 'vitest';
 import AuthPage from './AuthPage';
 
-const loginMock = vi.fn();
-const registerMock = vi.fn();
+const { loginMock, registerMock } = vi.hoisted(() => ({
+  loginMock: vi.fn(),
+  registerMock: vi.fn()
+}));
 
 vi.mock('@auth/keycloak', () => ({
   default: {

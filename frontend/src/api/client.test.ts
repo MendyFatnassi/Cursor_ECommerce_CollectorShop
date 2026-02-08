@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import client from './client';
 
-const updateTokenMock = vi.fn().mockResolvedValue(true);
+const { updateTokenMock } = vi.hoisted(() => ({
+  updateTokenMock: vi.fn().mockResolvedValue(true)
+}));
 
 vi.mock('@auth/keycloak', () => ({
   default: {
