@@ -1,5 +1,6 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { useEffect, type ReactNode } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
 import DashboardLayout from '@components/dashboard/DashboardLayout';
 import BuyerDashboard from '@components/dashboard/BuyerDashboard';
 import SellerDashboard from '@components/dashboard/SellerDashboard';
@@ -10,7 +11,7 @@ import AuthPage from '@components/auth/AuthPage';
 import HomePage from '@components/home/HomePage';
 import ProfilePage from '@components/profile/ProfilePage';
 import usePortalStore from '@store/usePortalStore';
-import client, { getAuthToken, setAuthToken } from '@api/client';
+import client from '@api/client';
 import { UserProfile, UserRole } from '@shared/index';
 
 const getDefaultPath = (profile?: UserProfile) => {
@@ -27,13 +28,17 @@ const getDefaultPath = (profile?: UserProfile) => {
 };
 
 const RoleGuard = ({ roles, children }: { roles: UserRole[]; children: ReactNode }) => {
+  const { keycloak, initialized } = useKeycloak();
   const profile = usePortalStore((state) => state.profile);
 
-  if (!profile && getAuthToken()) {
+  if (!initialized) {
     return <div className="card p-6 text-sm text-slate-500">Chargement de la session...</div>;
   }
-  if (!profile) {
+  if (!keycloak.authenticated) {
     return <Navigate to="/auth" replace />;
+  }
+  if (!profile) {
+    return <div className="card p-6 text-sm text-slate-500">Chargement de la session...</div>;
   }
   const hasRole = roles.some((role) => profile.roles.includes(role));
   if (!hasRole) {
@@ -43,15 +48,23 @@ const RoleGuard = ({ roles, children }: { roles: UserRole[]; children: ReactNode
 };
 
 const AuthRoute = () => {
+  const { keycloak, initialized } = useKeycloak();
   const profile = usePortalStore((state) => state.profile);
-  if (!profile && getAuthToken()) {
+  if (!initialized) {
     return (
       <div className="min-h-screen flex items-center justify-center text-sm text-slate-500">
         Chargement de la session...
       </div>
     );
   }
-  if (profile) {
+  if (keycloak.authenticated && !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-slate-500">
+        Chargement du profil...
+      </div>
+    );
+  }
+  if (keycloak.authenticated && profile) {
     return <Navigate to={getDefaultPath(profile)} replace />;
   }
   return <AuthPage />;
@@ -64,22 +77,21 @@ const ChatRoute = () => {
 };
 
 const App = () => {
+  const { keycloak, initialized } = useKeycloak();
   const profile = usePortalStore((state) => state.profile);
   const setProfile = usePortalStore((state) => state.setProfile);
 
   useEffect(() => {
-    if (profile) {
-      return;
-    }
-    const token = getAuthToken();
-    if (!token) {
+    if (!initialized || !keycloak.authenticated || profile) {
       return;
     }
     client
       .get<UserProfile>('/profiles/me')
       .then((response) => setProfile(response.data))
-      .catch(() => setAuthToken(null));
-  }, [profile, setProfile]);
+      .catch(() => {
+        // Laisse le flux Keycloak gérer la session.
+      });
+  }, [initialized, keycloak.authenticated, profile, setProfile]);
 
   return (
     <Routes>

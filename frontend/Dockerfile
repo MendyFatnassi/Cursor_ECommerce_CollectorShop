@@ -13,6 +13,14 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 # Copier le reste du code frontend (y compris index.html, src, vite.config, etc.)
 COPY . .
 
+# Variables Vite pour Keycloak (build-time)
+ARG VITE_KEYCLOAK_URL
+ARG VITE_KEYCLOAK_REALM
+ARG VITE_KEYCLOAK_CLIENT_ID
+ENV VITE_KEYCLOAK_URL=${VITE_KEYCLOAK_URL}
+ENV VITE_KEYCLOAK_REALM=${VITE_KEYCLOAK_REALM}
+ENV VITE_KEYCLOAK_CLIENT_ID=${VITE_KEYCLOAK_CLIENT_ID}
+
 # Construire l'application pour la prod
 RUN npm run build
 
