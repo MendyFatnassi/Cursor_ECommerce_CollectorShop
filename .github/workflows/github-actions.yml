@@ -41,6 +41,21 @@ jobs:
         working-directory: ./frontend
         run: npm run test:coverage
 
+      - name: Run Cypress E2E tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./frontend
+          install: false
+          start: npm run dev -- --host 127.0.0.1 --port 3000
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 120
+        env:
+          VITE_KEYCLOAK_URL: http://localhost:8180
+          VITE_KEYCLOAK_REALM: collectorshop
+          VITE_KEYCLOAK_CLIENT_ID: collector-shop-frontend
+          VITE_KEYCLOAK_DISABLED: 'true'
+          VITE_API_URL: http://localhost:8080
+
       - name: Backend coverage summary
         working-directory: ./backend
         run: |

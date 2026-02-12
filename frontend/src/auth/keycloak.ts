@@ -6,4 +6,14 @@ const keycloak = new Keycloak({
   clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID
 });
 
+if (import.meta.env.VITE_KEYCLOAK_DISABLED === 'true') {
+  keycloak.init = async () => false;
+  keycloak.login = async () => undefined;
+  keycloak.register = async () => undefined;
+  keycloak.logout = async () => undefined;
+  keycloak.updateToken = async () => false;
+  keycloak.authenticated = false;
+  keycloak.token = undefined;
+}
+
 export default keycloak;
