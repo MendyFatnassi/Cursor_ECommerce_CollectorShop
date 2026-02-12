@@ -13,6 +13,8 @@
     "test:coverage:business": "cross-env COVERAGE_PROFILE=business vitest run --coverage --config config/vite.config.ts",
     "test:coverage:infra": "cross-env COVERAGE_PROFILE=infra vitest run --coverage --config config/vite.config.ts",
     "test:coverage": "npm run test:coverage:business && npm run test:coverage:infra",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open",
     "test:watch": "vitest --config config/vite.config.ts",
     "deploy": "npm run build"
   },
@@ -37,6 +39,7 @@
     "@vitest/coverage-v8": "^2.1.9",
     "autoprefixer": "^10.4.23",
     "cross-env": "^7.0.3",
+    "cypress": "^13.11.0",
     "eslint": "^9.0.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.0.0",
