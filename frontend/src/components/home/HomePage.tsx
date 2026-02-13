@@ -10,7 +10,7 @@ const HomePage = () => {
       <section className="card p-8 flex flex-col gap-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-slate-500 font-semibold">Accueil</p>
-          <h1 className="text-3xl font-bold text-slate-900">Découvrez les boutiques et les articles de Collector shop</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Découvrez les boutiques et les articles</h1>
           <p className="text-slate-600 mt-2">
             Explorez le catalogue public et retrouvez vos recommandations personnalisées.
           </p>
